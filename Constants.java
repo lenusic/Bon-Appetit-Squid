@@ -376,12 +376,20 @@ public class Constants implements ActionListener, KeyListener {
 		collisionHelper(squid.getRectangle(), bc2.getRectangle(), squid.getBI(), bc2.getBI());
 		collisionHelper(squid.getRectangle(), tc1.getRectangle(), squid.getBI(), tc1.getBI());
 		collisionHelper(squid.getRectangle(), tc2.getRectangle(), squid.getBI(), tc2.getBI());
-
+		System.out.println(SCREEN_HEIGHT * 7 / 8);
+		System.out.println(squid.getY() + SQUID_HEIGHT);
 		if (squid.getY() + SQUID_HEIGHT > SCREEN_HEIGHT * 7 / 8) { // ground detection
+			System.out.println("game over" +  SCREEN_HEIGHT * 7 / 8);
+			System.out.println(squid.getY() + SQUID_HEIGHT);
 			pgs.sendText("Game Over");
 			loopVar = false;
 			gamePlay = false; // game has ended
 		}
+		if(squid.getY() + SQUID_HEIGHT < 100) { //ceiling detection
+			pgs.sendText("Too close to the surface. Game Over :(");
+			loopVar = false;
+			gamePlay = false; // game has ended
+		}	
 	}
 
 	/**
