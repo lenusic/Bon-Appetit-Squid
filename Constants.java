@@ -12,6 +12,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 
 public class Constants implements ActionListener, KeyListener {
 	// global constant variables
@@ -97,11 +98,14 @@ public class Constants implements ActionListener, KeyListener {
 		topPanel.setLayout(overlay);
 
 		// Start Game JButton
-		startGame = new JButton("Start Playing!");
-		startGame.setBackground(Color.BLUE);
-		startGame.setForeground(Color.WHITE);
+		startGame = new JButton("Start");
+		startGame.setForeground(new Color(0, 255, 0));
 		startGame.setFocusable(false); // rather than just setFocusabled(false)
-		startGame.setFont(new Font("Calibri", Font.BOLD, 42));
+		startGame.setFont(new Font("Tahoma", Font.BOLD, 42));
+		startGame.setBorderPainted(false);
+		startGame.setContentAreaFilled(false);
+		startGame.setFocusPainted(false);
+		startGame.setOpaque(false);
 		startGame.setAlignmentX(0.5f); // center horizontally on-screen
 		startGame.setAlignmentY(0.5f); // center vertically on-screen
 		startGame.addActionListener(this);
