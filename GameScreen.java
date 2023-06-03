@@ -117,6 +117,14 @@ public class GameScreen extends JPanel {
 	public void incrementJump() {
 		successfulJumps++;
 	}
+	
+	public boolean speedUp() {
+		if(successfulJumps != 0 && successfulJumps % 10 == 0) {
+			return true;
+		}else {
+			return false;
+		}
+	}
 
 	/**
 	 * Method called to return the current jump score

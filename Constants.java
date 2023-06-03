@@ -22,7 +22,7 @@ public class Constants implements ActionListener, KeyListener {
 	private static final int CORAL_WIDTH = SCREEN_WIDTH / 8, CORAL_HEIGHT = 4 * CORAL_WIDTH;
 	private static final int SQUID_WIDTH = 120, SQUID_HEIGHT = 75;
 	private static final int UPDATE_DIFFERENCE = 25; // time in ms between updates
-	private static final int X_MOVEMENT_DIFFERENCE = 5; // distance the corals move every update
+	private static int X_MOVEMENT_DIFFERENCE = 5; // distance the corals move every update
 	private static final int SCREEN_DELAY = 300; // needed because of long load times forcing corals to pop up mid-screen
 	private static final int SQUID_X_LOCATION = SCREEN_WIDTH / 7;
 	private static final int SQUID_JUMP_DIFF = 10, SQUID_FALL_DIFF = SQUID_JUMP_DIFF / 2,
@@ -320,6 +320,7 @@ public class Constants implements ActionListener, KeyListener {
 															// get image width and have cascading error in collision
 					collisionDetection(bc1, bc2, tc1, tc2, squid);
 					updateScore(bc1, bc2, squid);
+					updateSpeed(bc1, bc2, squid);
 				}
 
 				// update pgs's JPanel
@@ -359,6 +360,12 @@ public class Constants implements ActionListener, KeyListener {
 		} else if (bc2.getX() + CORAL_WIDTH < squid.getX()
 				&& bc2.getX() + CORAL_WIDTH > squid.getX() - X_MOVEMENT_DIFFERENCE) {
 			pgs.incrementJump();
+		}
+	}
+	
+	private void updateSpeed(BottomCoral bc1, BottomCoral bc2, Squid squid) {
+		if(pgs.speedUp()) {
+			X_MOVEMENT_DIFFERENCE = 10;
 		}
 	}
 
