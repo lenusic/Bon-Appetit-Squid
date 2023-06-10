@@ -105,8 +105,12 @@ public class BottomCoral {
 	 * @return TopCoral's BufferedImage object
 	 */
 	public BufferedImage getBI() {
-		BufferedImage bi = new BufferedImage(bottomCoral.getWidth(null), bottomCoral.getHeight(null),
-				BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage(1, 1,
+                BufferedImage.TYPE_INT_ARGB);
+        if(bottomCoral.getWidth(null) > 0 && bottomCoral.getHeight(null) > 0) {
+            bi = new BufferedImage(bottomCoral.getWidth(null), bottomCoral.getHeight(null),
+                    BufferedImage.TYPE_INT_ARGB);
+        }
 		Graphics g = bi.getGraphics();
 		g.drawImage(bottomCoral, 0, 0, null);
 		g.dispose();

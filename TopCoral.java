@@ -105,8 +105,12 @@ public class TopCoral {
 	 * @return TopPipe's BufferedImage object
 	 */
 	public BufferedImage getBI() {
-		BufferedImage bi = new BufferedImage(topCoral.getWidth(null), topCoral.getHeight(null),
-				BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage(1, 1,
+                BufferedImage.TYPE_INT_ARGB);
+        if(topCoral.getWidth(null) > 0 && topCoral.getHeight(null) > 0) {
+            bi = new BufferedImage(topCoral.getWidth(null), topCoral.getHeight(null),
+                    BufferedImage.TYPE_INT_ARGB);
+        }
 		Graphics g = bi.getGraphics();
 		g.drawImage(topCoral, 0, 0, null);
 		g.dispose();

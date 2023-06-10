@@ -32,19 +32,20 @@ public class Constants implements ActionListener, KeyListener {
 
 	// global variables
 	private boolean loopVar = true; // false -> don't run loop; true -> run loop for corals
-	private boolean gamePlay = false; // false -> game not being played
+	private boolean gamePlay = false; // false -> game not being played or game is over
 	private boolean squidThrust = false; // false -> key has not been pressed to move the squid vertically
 	private boolean squidFired = false; // true -> button pressed before jump completes
 	private boolean released = true; // space bar released; starts as true so first press registers
 	private int squidYTracker = SCREEN_HEIGHT / 2 - SQUID_HEIGHT;
 	private Object buildComplete = new Object();
 	private boolean eaten = false;
+	private boolean gameOver = false;
 
 	// global swing objects
-	private JFrame f = new JFrame("Limber Squid");
-	private JButton startGame;
+	private JFrame frame = new JFrame("Limber Squid");
+	private static JButton startGame, restartGame;
 	private JPanel topPanel; // declared globally to accommodate the repaint operation and allow for
-								// removeAll(), etc.
+							 // removeAll(), etc.
 
 	// other global objects
 	private static Constants tc = new Constants();
@@ -57,7 +58,6 @@ public class Constants implements ActionListener, KeyListener {
 
 	}
 
-	
 	public static void main(String[] args) {
 
 		// build the GUI on a new thread
@@ -77,30 +77,15 @@ public class Constants implements ActionListener, KeyListener {
 	}
 
 	/**
-	 * Method to construct the JFrame and add the program content
+	 * Sets squid location to the right place, should be called on start and on restart
 	 */
-	private void buildFrame() {
-		Image icon = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("resources/squiddy.png"));
-
-		f.setContentPane(createContentPane());
-		f.setResizable(true);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setAlwaysOnTop(false);
-		f.setVisible(true);
-		f.setMinimumSize(new Dimension(SCREEN_WIDTH * 1 / 4, SCREEN_HEIGHT * 1 / 4));
-		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		f.setIconImage(icon);
-		f.addKeyListener(this);
+	public void squidRespawn(){
+		squidYTracker = SCREEN_HEIGHT / 2 - SQUID_HEIGHT;
+		System.out.println("Squid respawned");
 	}
 
-	private JPanel createContentPane() {
-		topPanel = new JPanel(); // top-most JPanel in layout hierarchy
-		topPanel.setBackground(Color.BLACK);
-		// allow us to layer the panels
-		LayoutManager overlay = new OverlayLayout(topPanel);
-		topPanel.setLayout(overlay);
-
-		// Start Game JButton
+	// add Start Game JButton
+	private void addStartButton(){
 		startGame = new JButton("Start");
 		startGame.setForeground(new Color(0, 255, 0));
 		startGame.setFocusable(false); // rather than just setFocusabled(false)
@@ -109,12 +94,44 @@ public class Constants implements ActionListener, KeyListener {
 		startGame.setContentAreaFilled(false);
 		startGame.setFocusPainted(false);
 		startGame.setOpaque(false);
+		startGame.setVisible(true);
 		startGame.setAlignmentX(0.5f); // center horizontally on-screen
 		startGame.setAlignmentY(0.5f); // center vertically on-screen
-		startGame.addActionListener(this);
+		startGame.addActionListener(this); // register listener to this object actions
 		topPanel.add(startGame);
+	}
 
-		// must add last to ensure button's visibility
+	// add Restart game JButton
+	private void addRestartButton(){
+		restartGame = new JButton("Restart");
+		restartGame.setForeground(new Color(0, 255, 127));
+		restartGame.setFocusable(false);
+		restartGame.setFont(new Font("Tahoma", Font.BOLD, 42));
+		restartGame.setBorderPainted(false);
+		restartGame.setContentAreaFilled(false);
+		restartGame.setFocusPainted(false);
+		restartGame.setOpaque(false);
+		restartGame.setAlignmentX(0.5f); // center horizontally on-screen
+		restartGame.setAlignmentY(0.01f); // center vertically on-screen
+		restartGame.addActionListener(this);
+		restartGame.setVisible(true);
+		topPanel.add(restartGame);
+	}
+
+	private JPanel createContentPane() {
+		topPanel = new JPanel(); // top-most JPanel in layout hierarchy
+		// allow us to layer the panels
+		LayoutManager overlay = new OverlayLayout(topPanel);
+		topPanel.setLayout(overlay);
+
+		if(gameOver== true)
+			addRestartButton();
+		else
+			addStartButton();
+			
+
+		// must add last to ensure button's visibility. 
+		// UPD: not button, it appends the moving background(pgs) to the topPanel
 		pgs = new GameScreen(SCREEN_WIDTH, SCREEN_HEIGHT, true); // true --> we want pgs to be the splash screen
 		topPanel.add(pgs);
 
@@ -122,14 +139,33 @@ public class Constants implements ActionListener, KeyListener {
 	}
 
 	/**
+	 * Method to construct the JFrame and add the program content
+	 */
+	private void buildFrame() {
+		Image squidAvatar = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("resources/squiddy.png"));
+
+		frame.setContentPane(createContentPane());
+		frame.setResizable(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setAlwaysOnTop(false);
+		frame.setVisible(true);
+		frame.setMinimumSize(new Dimension(SCREEN_WIDTH * 1 / 4, SCREEN_HEIGHT * 1 / 4));
+		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		frame.setIconImage(squidAvatar);
+		frame.addKeyListener(this);
+	}
+
+	/**
 	 * Implementation for action events
 	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == startGame) {
+			System.out.println(">>> start btn pressed, starting the game");
 			// stop the splash screen
 			loopVar = false;
+			gamePlay = true; // ???
 
-			fadeOperation();
+			fadeOperation(); 
 		} else if (e.getSource() == buildComplete) {
 			Thread t = new Thread() {
 				public void run() {
@@ -139,7 +175,14 @@ public class Constants implements ActionListener, KeyListener {
 				}
 			};
 			t.start();
-		}
+		} else if (e.getSource() == restartGame) { // listen to restart button press
+			System.out.println(">>> restart btn pressed");
+			// stop the splash screen
+			loopVar = false;
+			gamePlay = true;
+			squidRespawn();
+			fadeOperation(); 
+		} 
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -169,7 +212,6 @@ public class Constants implements ActionListener, KeyListener {
 	}
 
 	public void keyTyped(KeyEvent e) {
-
 	}
 
 	/**
@@ -235,7 +277,6 @@ public class Constants implements ActionListener, KeyListener {
 				actionPerformed(new ActionEvent(buildComplete, -1, "Build Finished"));
 			}
 		};
-
 		t.start();
 	}
 
@@ -259,8 +300,8 @@ public class Constants implements ActionListener, KeyListener {
 		int xLocFish1 = SCREEN_WIDTH / 5 + SCREEN_DELAY,
 				xLocFish2 = (int) ((double) 3.0 / 2.0 * (SCREEN_WIDTH) + FISH_WIDTH / 2.0) + SCREEN_DELAY,
 				xLocFish3 = (int) ((double) 3.0 / 2.0 * (SCREEN_WIDTH) + FISH_WIDTH / 2.0) + SCREEN_DELAY;
-		int yLoc1 = bottomCoralLoc(), yLoc2 = bottomCoralLoc();
 		int fishY1 = fishLoc(), fishY2 = fishLoc(), fishY3 = fishLoc();
+		int yLoc1 = generateBottomCoralLocation(), yLoc2 = generateBottomCoralLocation();
 		int squidX = SQUID_X_LOCATION, squidY = squidYTracker;
 
 		// variable to hold the loop start time
@@ -268,14 +309,15 @@ public class Constants implements ActionListener, KeyListener {
 
 		while (loopVar) {
 			if ((System.currentTimeMillis() - startTime) > UPDATE_DIFFERENCE) {
+				System.out.println(">>> Loop gamePlay:" + gamePlay);
 				// check if a set of corals has left the screen
 				// if so, reset the coral's X location and assign a new Y location
 				if (xLoc1 < (0 - CORAL_WIDTH)) {
 					xLoc1 = SCREEN_WIDTH;
-					yLoc1 = bottomCoralLoc();
+					yLoc1 = generateBottomCoralLocation();
 				} else if (xLoc2 < (0 - CORAL_WIDTH)) {
 					xLoc2 = SCREEN_WIDTH;
-					yLoc2 = bottomCoralLoc();
+					yLoc2 = generateBottomCoralLocation();
 				}
 				
 				if (xLocFish1 < (0 - FISH_WIDTH)) {
@@ -375,7 +417,7 @@ public class Constants implements ActionListener, KeyListener {
 	 * 
 	 * @return int
 	 */
-	private int bottomCoralLoc() {
+	private int generateBottomCoralLocation() {
 		int temp = 0;
 		// iterate until temp is a value that allows both corals to be onscreen
 		while (temp <= CORALS_GAP + 50 || temp >= SCREEN_HEIGHT - CORALS_GAP) {
@@ -445,16 +487,27 @@ public class Constants implements ActionListener, KeyListener {
 		collisionHelper(squid.getRectangle(), bc2.getRectangle(), squid.getBI(), bc2.getBI());
 		collisionHelper(squid.getRectangle(), tc1.getRectangle(), squid.getBI(), tc1.getBI());
 		collisionHelper(squid.getRectangle(), tc2.getRectangle(), squid.getBI(), tc2.getBI());
+
 		if (squid.getY() + SQUID_HEIGHT > SCREEN_HEIGHT * 7 / 8) { // ground detection
-			pgs.sendText("You touched the floor. Game Over");
+			System.out.println("game over: " +  SCREEN_HEIGHT * 7 / 8);
+			pgs.sendText("Game Over");
+			gameOver = true;
 			loopVar = false;
 			gamePlay = false; // game has ended
-		}
-		if(squid.getY() + SQUID_HEIGHT < 100) { //ceiling detection
-			pgs.sendText("Too close to the surface. Game Over");
+
+			tc.buildFrame(); // fixes the adding restart button but spoils pgs.sendText()
+		} else if(squid.getY() + SQUID_HEIGHT < 100) { //ceiling detection
+			pgs.sendText("Too close to the surface. Game Over :(");
+			// showRestartButton();
+			restartGame.setVisible(true);
+			topPanel.revalidate();
+			topPanel.repaint();
 			loopVar = false;
 			gamePlay = false; // game has ended
-		}	
+			gameOver = true;
+
+			tc.buildFrame(); // fixes the adding restart button but spoils pgs.sendText()
+		}		
 	}
 	
 	private void collisionFood(Fish f1, Fish f2, Fish f3, Squid squid) {
@@ -462,6 +515,7 @@ public class Constants implements ActionListener, KeyListener {
 		collisionHelperFood(squid.getRectangle(), f2.getRectangle(), squid.getBI(), f2.getBI());
 		collisionHelperFood(squid.getRectangle(), f3.getRectangle(), squid.getBI(), f3.getBI());
 	}
+
 	/**
 	 * Helper method to test the Squid object's potential collision with a coral
 	 * object.
