@@ -15,12 +15,14 @@ public class GameScreen extends JPanel {
 	private int screenWidth, screenHeight;
 	private boolean isSplash = true;
 	private int successfulJumps = 0;
+	private int food = 0;
 	private String message = "Limber Squid";
 	private Font primaryFont = new Font("Futura", Font.BOLD, 56), failFont = new Font("Calibri", Font.BOLD, 56);
 	private int messageWidth = 0, scoreWidth = 0;
 	private BottomCoral bc1, bc2;
 	private TopCoral tc1, tc2;
 	private Squid squid;
+	private Fish fish1, fish2, fish3;
 
 	/**
 	 * Default constructor for the GameScreen class
@@ -53,6 +55,15 @@ public class GameScreen extends JPanel {
 			g.drawImage(bc2.getCoral(), bc2.getX(), bc2.getY(), null);
 			g.drawImage(tc1.getCoral(), tc1.getX(), tc1.getY(), null);
 			g.drawImage(tc2.getCoral(), tc2.getX(), tc2.getY(), null);
+			if(fish1.isVisible()) {
+				g.drawImage(fish1.getFish(), fish1.getX(), fish1.getY(), null);
+			}
+			if(fish2.isVisible()) {
+				g.drawImage(fish2.getFish(), fish2.getX(), fish2.getY(), null);
+			}
+			if(fish3.isVisible()) {
+				g.drawImage(fish3.getFish(), fish3.getX(), fish3.getY(), null);
+			}
 		}
 
 		if (!isSplash && squid != null) {
@@ -76,6 +87,7 @@ public class GameScreen extends JPanel {
 
 		if (!isSplash) {
 			g.drawString(String.format("%d", successfulJumps), screenWidth / 2 - scoreWidth / 2, 50);
+			g.drawString(String.format("%d", food), screenWidth / 2 - scoreWidth / 2, 100);
 		}
 	}
 
@@ -109,6 +121,12 @@ public class GameScreen extends JPanel {
 	public void setSquid(Squid squid) {
 		this.squid = squid;
 	}
+	
+	public void setFish(Fish fish1, Fish fish2, Fish fish3) {
+		this.fish1 = fish1;
+		this.fish2 = fish2;
+		this.fish3 = fish3;
+	}
 
 	/**
 	 * Method called to invoke an increase in the variable tracking the current jump
@@ -116,6 +134,11 @@ public class GameScreen extends JPanel {
 	 */
 	public void incrementJump() {
 		successfulJumps++;
+	}
+	
+	public void incrementFood() {
+		food++;
+		System.out.println("Food" + food);
 	}
 	
 	public boolean speedUp() {
@@ -133,6 +156,10 @@ public class GameScreen extends JPanel {
 	 */
 	public int getScore() {
 		return successfulJumps;
+	}
+	
+	public int getFoodScore() {
+		return food;
 	}
 
 	/**

@@ -113,8 +113,12 @@ public class Squid {
 	 * @return Squid's BufferedImage object
 	 */
 	public BufferedImage getBI() {
-		BufferedImage bi = new BufferedImage(limberSquid.getWidth(null), limberSquid.getHeight(null),
-				BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bi = new BufferedImage(1, 1,
+                BufferedImage.TYPE_INT_ARGB);
+        if(limberSquid.getWidth(null) > 0 && limberSquid.getHeight(null) > 0) {
+            bi = new BufferedImage(limberSquid.getWidth(null), limberSquid.getHeight(null),
+                    BufferedImage.TYPE_INT_ARGB);
+        }
 		Graphics g = bi.getGraphics();
 		g.drawImage(limberSquid, 0, 0, null);
 		g.dispose();
