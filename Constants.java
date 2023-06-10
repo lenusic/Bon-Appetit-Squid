@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -20,6 +21,7 @@ public class Constants implements ActionListener, KeyListener {
 	private static final int SCREEN_HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 	private static final int CORALS_GAP = SCREEN_HEIGHT / 5; // distance in pixels between corals
 	private static final int CORAL_WIDTH = SCREEN_WIDTH / 8, CORAL_HEIGHT = 4 * CORAL_WIDTH;
+	private static final int FISH_WIDTH = SCREEN_WIDTH / 2, FISH_HEIGHT = 2 * FISH_WIDTH;
 	private static final int SQUID_WIDTH = 120, SQUID_HEIGHT = 75;
 	private static final int UPDATE_DIFFERENCE = 25; // time in ms between updates
 	private static int X_MOVEMENT_DIFFERENCE = 5; // distance the corals move every update
@@ -36,6 +38,7 @@ public class Constants implements ActionListener, KeyListener {
 	private boolean released = true; // space bar released; starts as true so first press registers
 	private int squidYTracker = SCREEN_HEIGHT / 2 - SQUID_HEIGHT;
 	private Object buildComplete = new Object();
+	private boolean eaten = false;
 
 	// global swing objects
 	private JFrame f = new JFrame("Limber Squid");
@@ -245,11 +248,19 @@ public class Constants implements ActionListener, KeyListener {
 		TopCoral tc1 = new TopCoral(CORAL_WIDTH, CORAL_HEIGHT);
 		TopCoral tc2 = new TopCoral(CORAL_WIDTH, CORAL_HEIGHT);
 		Squid squid = new Squid(SQUID_WIDTH, SQUID_HEIGHT);
+		Fish fish1 = new Fish(80, 60, "resources/green-fish.png");
+		Fish fish2 = new Fish(60, 40, "resources/fish2.png");
+		Fish fish3 = new Fish(60, 40, "resources/yellow-fish.png");
+
 
 		// variables to track x and y image locations for the bottom coral
 		int xLoc1 = SCREEN_WIDTH + SCREEN_DELAY,
 				xLoc2 = (int) ((double) 3.0 / 2.0 * SCREEN_WIDTH + CORAL_WIDTH / 2.0) + SCREEN_DELAY;
+		int xLocFish1 = SCREEN_WIDTH / 5 + SCREEN_DELAY,
+				xLocFish2 = (int) ((double) 3.0 / 2.0 * (SCREEN_WIDTH) + FISH_WIDTH / 2.0) + SCREEN_DELAY,
+				xLocFish3 = (int) ((double) 3.0 / 2.0 * (SCREEN_WIDTH) + FISH_WIDTH / 2.0) + SCREEN_DELAY;
 		int yLoc1 = bottomCoralLoc(), yLoc2 = bottomCoralLoc();
+		int fishY1 = fishLoc(), fishY2 = fishLoc(), fishY3 = fishLoc();
 		int squidX = SQUID_X_LOCATION, squidY = squidYTracker;
 
 		// variable to hold the loop start time
@@ -266,10 +277,27 @@ public class Constants implements ActionListener, KeyListener {
 					xLoc2 = SCREEN_WIDTH;
 					yLoc2 = bottomCoralLoc();
 				}
+				
+				if (xLocFish1 < (0 - FISH_WIDTH)) {
+					xLocFish1 = SCREEN_WIDTH / 5 + SCREEN_DELAY;
+					fishY1 = fishLoc();
+				}
+				else if (xLocFish2 < (0 - FISH_WIDTH)) {
+					xLocFish2 = SCREEN_WIDTH;
+					fishY2 = fishLoc();
+				}
+				else if (xLocFish3 < (0 - FISH_WIDTH)) {
+					xLocFish3 = SCREEN_WIDTH;
+					fishY3 = fishLoc();
+				}
 
 				// decrement the coral locations by the predetermined amount
 				xLoc1 -= X_MOVEMENT_DIFFERENCE;
 				xLoc2 -= X_MOVEMENT_DIFFERENCE;
+				
+				xLocFish1 -= X_MOVEMENT_DIFFERENCE;
+				xLocFish2 -= X_MOVEMENT_DIFFERENCE;
+				xLocFish3 -= X_MOVEMENT_DIFFERENCE;
 
 				if (squidFired && !isSplash) {
 					squidYTracker = squidY;
@@ -280,7 +308,7 @@ public class Constants implements ActionListener, KeyListener {
 					// move squid vertically
 					if (squidYTracker - squidY - SQUID_JUMP_DIFF < SQUID_JUMP_HEIGHT) {
 						if (squidY - SQUID_JUMP_DIFF > 0) {
-							squidY -= SQUID_JUMP_DIFF; // coordinates different
+							squidY -= SQUID_JUMP_DIFF;
 						} else {
 							squidY = 0;
 							squidYTracker = squidY;
@@ -304,6 +332,12 @@ public class Constants implements ActionListener, KeyListener {
 				tc1.setY(yLoc1 - CORALS_GAP - CORAL_HEIGHT); // ensure tc1 placed in proper location
 				tc2.setX(xLoc2);
 				tc2.setY(yLoc2 - CORALS_GAP - CORAL_HEIGHT); // ensure tc2 placed in proper location
+				fish1.setX(xLocFish1);
+				fish1.setY(fishY1);
+				fish2.setX(xLocFish2);
+				fish2.setY(fishY2);
+				fish3.setX(xLocFish3);
+				fish3.setY(fishY3);
 
 				if (!isSplash) {
 					squid.setX(squidX);
@@ -315,12 +349,15 @@ public class Constants implements ActionListener, KeyListener {
 				// the local variables
 				pgs.setBottomCoral(bc1, bc2);
 				pgs.setTopCoral(tc1, tc2);
+				pgs.setFish(fish1, fish2, fish3);
+				collisionFood(fish1, fish2, fish3, squid);
 
 				if (!isSplash && squid.getWidth() != -1) { // need the second part because if squid not on-screen, cannot
 															// get image width and have cascading error in collision
 					collisionDetection(bc1, bc2, tc1, tc2, squid);
 					updateScore(bc1, bc2, squid);
 					updateSpeed(bc1, bc2, squid);
+					updateFoodScore(fish1, fish2, fish3, squid);
 				}
 
 				// update pgs's JPanel
@@ -346,6 +383,15 @@ public class Constants implements ActionListener, KeyListener {
 		}
 		return temp;
 	}
+	
+	private int fishLoc() {
+		int temp = 0;
+		// iterate until temp is a value that allows both corals to be onscreen
+		while (temp <= CORALS_GAP + 30 || temp >= SCREEN_HEIGHT - CORALS_GAP) {
+			temp = (int) ((double) Math.random() * ((double) SCREEN_HEIGHT));
+		}
+		return temp;
+	}
 
 	/**
 	 * Method that checks whether the score needs to be updated
@@ -363,9 +409,25 @@ public class Constants implements ActionListener, KeyListener {
 		}
 	}
 	
+	private void updateFoodScore(Fish f1, Fish f2, Fish f3, Squid squid) {
+		if (f1.getX()< squid.getX()
+				&& f1.getX()> squid.getX() - X_MOVEMENT_DIFFERENCE) {
+			pgs.incrementFood();
+			f1.setVisible(false);
+		} else if (f2.getX()< squid.getX()
+				&& f2.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE) {
+			pgs.incrementFood();
+			f2.setVisible(false);
+		}else if (f3.getX() < squid.getX()
+				&& f3.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE) {
+			pgs.incrementFood();
+			f3.setVisible(false);
+		}
+	}
+	
 	private void updateSpeed(BottomCoral bc1, BottomCoral bc2, Squid squid) {
 		if(pgs.speedUp()) {
-			X_MOVEMENT_DIFFERENCE = 10;
+			X_MOVEMENT_DIFFERENCE += 5;
 		}
 	}
 
@@ -383,22 +445,23 @@ public class Constants implements ActionListener, KeyListener {
 		collisionHelper(squid.getRectangle(), bc2.getRectangle(), squid.getBI(), bc2.getBI());
 		collisionHelper(squid.getRectangle(), tc1.getRectangle(), squid.getBI(), tc1.getBI());
 		collisionHelper(squid.getRectangle(), tc2.getRectangle(), squid.getBI(), tc2.getBI());
-		System.out.println(SCREEN_HEIGHT * 7 / 8);
-		System.out.println(squid.getY() + SQUID_HEIGHT);
 		if (squid.getY() + SQUID_HEIGHT > SCREEN_HEIGHT * 7 / 8) { // ground detection
-			System.out.println("game over" +  SCREEN_HEIGHT * 7 / 8);
-			System.out.println(squid.getY() + SQUID_HEIGHT);
-			pgs.sendText("Game Over");
+			pgs.sendText("You touched the floor. Game Over");
 			loopVar = false;
 			gamePlay = false; // game has ended
 		}
 		if(squid.getY() + SQUID_HEIGHT < 100) { //ceiling detection
-			pgs.sendText("Too close to the surface. Game Over :(");
+			pgs.sendText("Too close to the surface. Game Over");
 			loopVar = false;
 			gamePlay = false; // game has ended
 		}	
 	}
-
+	
+	private void collisionFood(Fish f1, Fish f2, Fish f3, Squid squid) {
+		collisionHelperFood(squid.getRectangle(), f1.getRectangle(), squid.getBI(), f1.getBI());
+		collisionHelperFood(squid.getRectangle(), f2.getRectangle(), squid.getBI(), f2.getBI());
+		collisionHelperFood(squid.getRectangle(), f3.getRectangle(), squid.getBI(), f3.getBI());
+	}
 	/**
 	 * Helper method to test the Squid object's potential collision with a coral
 	 * object.
@@ -422,10 +485,34 @@ public class Constants implements ActionListener, KeyListener {
 				for (int j = firstJ; j < r.getHeight() + firstJ; j++) {
 					if ((b1.getRGB(i, j) & 0xFF000000) != 0x00
 							&& (b2.getRGB(i + bp1XHelper, j + bp1YHelper) & 0xFF000000) != 0x00) {
-						pgs.sendText("Game Over");
-						loopVar = false; // stop the game loop
-						gamePlay = false; // game has ended
+                        pgs.sendText("Game Over");
+                        loopVar = false; // stop the game loop
+                        gamePlay = false; // game has ended
+                        break;
+					}
+				}
+			}
+		}
+	}
+	
+	private void collisionHelperFood(Rectangle r1, Rectangle r2, BufferedImage b1, BufferedImage b2) {
+		if (r1.intersects(r2)) {
+			Rectangle r = r1.intersection(r2);
+
+			int firstI = (int) (r.getMinX() - r1.getMinX()); // firstI is the first x-pixel to iterate from
+			int firstJ = (int) (r.getMinY() - r1.getMinY()); // firstJ is the first y-pixel to iterate from
+			int bp1XHelper = (int) (r1.getMinX() - r2.getMinX()); // helper variables to use when referring to collision
+																	// object
+			int bp1YHelper = (int) (r1.getMinY() - r2.getMinY());
+
+			for (int i = firstI; i < r.getWidth() + firstI; i++) { //
+				for (int j = firstJ; j < r.getHeight() + firstJ; j++) {
+					if ((b1.getRGB(i, j) & 0xFF000000) != 0x00
+							&& (b2.getRGB(i + bp1XHelper, j + bp1YHelper) & 0xFF000000) != 0x00) {
+						eaten = true;
 						break;
+					}else {
+						eaten = false;
 					}
 				}
 			}

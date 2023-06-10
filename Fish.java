@@ -7,17 +7,27 @@ import java.awt.image.BufferedImage;
 public class Fish {
 	private Image fish;
 	private int xLoc = 0, yLoc = 0;
+	private boolean isVisible;
 	
-	public Fish(int initialWidth, int initialHeight) {
-		fish = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("resources/fish.png"));
+	public Fish(int initialWidth, int initialHeight, String image) {
+		fish = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource(image));
 		scaleFish(initialWidth, initialHeight);
+		isVisible = true;
 	}
 	
 	public void scaleFish(int width, int height) {
 		fish = fish.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 	}
 	
-	public Image getCoral() {
+	public boolean isVisible() {
+		return isVisible;
+	}
+	
+	public void setVisible(boolean visible) {
+		isVisible = visible;
+	}
+	
+	public Image getFish() {
 		return fish;
 	}
 
@@ -50,8 +60,12 @@ public class Fish {
 	}
 
 	public BufferedImage getBI() {
-		BufferedImage bi = new BufferedImage(fish.getWidth(null), fish.getHeight(null),
-				BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bi = new BufferedImage(1, 1,
+                BufferedImage.TYPE_INT_ARGB);
+        if(fish.getWidth(null) > 0 && fish.getHeight(null) > 0) {
+            bi = new BufferedImage(fish.getWidth(null), fish.getHeight(null),
+                    BufferedImage.TYPE_INT_ARGB);
+        }
 		Graphics g = bi.getGraphics();
 		g.drawImage(fish, 0, 0, null);
 		g.dispose();
