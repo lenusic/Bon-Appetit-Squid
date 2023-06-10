@@ -42,12 +42,7 @@ public class GameScreen extends JPanel {
 		
 		Image sea = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("resources/ocean.gif"));
 		g.drawImage(sea, 0, 0, screenWidth , screenHeight, null);
-		//g.setColor(new Color(89, 81, 247)); // color for the blue ocean
-		//g.fillRect(0, 0, screenWidth, screenHeight * 7 / 8); // create the ocean rectangle
-		//g.setColor(new Color(147, 136, 9)); // brown color for ocean floor
-		//g.fillRect(0, screenHeight * 7 / 8, screenWidth, screenHeight / 8); // create the ocean floor rectangle
 		g.setColor(Color.WHITE); // dividing line color
-		//g.drawLine(0, screenHeight * 7 / 8, screenWidth, screenHeight * 7 / 8); // draw the dividing line
 
 		// objects must be instantiated before they're drawn!
 		if (bc1 != null && bc2 != null && tc1 != null && tc2 != null) {
