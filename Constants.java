@@ -39,7 +39,10 @@ public class Constants implements ActionListener, KeyListener {
 	private boolean released = true; // space bar released; starts as true so first press registers
 	private int squidYTracker = SCREEN_HEIGHT / 2 - SQUID_HEIGHT;
 	private Object buildComplete = new Object();
-	private boolean eaten = false;
+	private boolean eatenFish1 = false;
+	private boolean eatenFish2 = false;
+	private boolean eatenFish3 = false;
+
 	private boolean gameOver = false;
 
 	// global swing objects
@@ -361,9 +364,9 @@ public class Constants implements ActionListener, KeyListener {
 				xLoc1 -= X_MOVEMENT_DIFFERENCE;
 				xLoc2 -= X_MOVEMENT_DIFFERENCE;
 
-				xLocFish1 -= X_MOVEMENT_DIFFERENCE;
-				xLocFish2 -= X_MOVEMENT_DIFFERENCE;
-				xLocFish3 -= X_MOVEMENT_DIFFERENCE;
+				xLocFish1 -= X_MOVEMENT_DIFFERENCE * 1.1;
+				xLocFish2 -= X_MOVEMENT_DIFFERENCE * 1.3;
+				xLocFish3 -= X_MOVEMENT_DIFFERENCE * 1.5;
 
 				if (squidFired && !isSplash) {
 					squidYTracker = squidY;
@@ -416,15 +419,15 @@ public class Constants implements ActionListener, KeyListener {
 				pgs.setBottomCoral(bc1, bc2);
 				pgs.setTopCoral(tc1, tc2);
 				pgs.setFish(fish1, fish2, fish3);
-				collisionFood(fish1, fish2, fish3, squid);
 
 				if (!isSplash && squid.getWidth() != -1) { // need the second part because if squid not on-screen,
 															// cannot
 															// get image width and have cascading error in collision
 					collisionDetection(bc1, bc2, tc1, tc2, squid);
 					updateScore(bc1, bc2, squid);
-					updateSpeed(bc1, bc2, squid);
- 					updateFoodScore(fish1, fish2, fish3, squid);
+					updateSpeed(bc1, bc2, squid);				
+					collisionFood(fish1, fish2, fish3, squid);
+
 				}
 
 				// update pgs's JPanel
@@ -479,16 +482,18 @@ public class Constants implements ActionListener, KeyListener {
 
 	private void updateFoodScore(Fish f1, Fish f2, Fish f3, Squid squid) {
 		if (f1.getX() < squid.getX()
-				&& f1.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE
-				&& f1.isVisible) {
+				&& f1.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE * 1.1
+				&& eatenFish1) {
      			pgs.incrementFood();
 			f1.setVisible(false);
-		} else if (f2.getX() < squid.getX()
-				&& f2.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE) {
+		}
+		if (f2.getX() < squid.getX()
+				&& f2.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE * 1.3 && eatenFish2) {
 			pgs.incrementFood();
 			f2.setVisible(false);
-		} else if (f3.getX() < squid.getX()
-				&& f3.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE) {
+		}
+		if (f3.getX() < squid.getX()
+				&& f3.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE * 1.5 && eatenFish3) {
 			pgs.incrementFood();
 			f3.setVisible(false);
 		}
@@ -516,8 +521,6 @@ public class Constants implements ActionListener, KeyListener {
 		collisionHelper(squid.getRectangle(), tc2.getRectangle(), squid.getBI(), tc2.getBI());
 
 		if (squid.getY() + SQUID_HEIGHT > SCREEN_HEIGHT * 7 / 8) { // ground detection
-			System.out.println("game over: " + SCREEN_HEIGHT * 7 / 8);
-			System.out.println(squid.getY() + SQUID_HEIGHT);
 			gameOver = true;
 			loopVar = false;
 			gamePlay = false; // game has ended
@@ -532,11 +535,18 @@ public class Constants implements ActionListener, KeyListener {
 	}
 
 	private void collisionFood(Fish f1, Fish f2, Fish f3, Squid squid) {
-		if(f1.isVisible){
-			collisionHelperFood(squid.getRectangle(), f1.getRectangle(), squid.getBI(), f1.getBI());
+		if(collisionHelperFood(squid.getRectangle(), f1.getRectangle(), squid.getBI(), f1.getBI())){
+			eatenFish1 = true;
+			updateFoodScore(f1, f2, f3, squid);
 		}
-		collisionHelperFood(squid.getRectangle(), f2.getRectangle(), squid.getBI(), f2.getBI());
-		collisionHelperFood(squid.getRectangle(), f3.getRectangle(), squid.getBI(), f3.getBI());
+		if(collisionHelperFood(squid.getRectangle(), f2.getRectangle(), squid.getBI(), f2.getBI())){
+			eatenFish2 = true;
+			updateFoodScore(f1, f2, f3, squid);
+		}
+		if(collisionHelperFood(squid.getRectangle(), f3.getRectangle(), squid.getBI(), f3.getBI())){
+			eatenFish3 = true;
+			updateFoodScore(f1, f2, f3, squid);
+		}
 	}
 
 	/**
@@ -573,27 +583,11 @@ public class Constants implements ActionListener, KeyListener {
 		}
 	}
 
-	private void collisionHelperFood(Rectangle r1, Rectangle r2, BufferedImage b1, BufferedImage b2) {
+	private boolean collisionHelperFood(Rectangle r1, Rectangle r2, BufferedImage b1, BufferedImage b2) {
 		if (r1.intersects(r2)) {
-			Rectangle r = r1.intersection(r2);
-
-			int firstI = (int) (r.getMinX() - r1.getMinX()); // firstI is the first x-pixel to iterate from
-			int firstJ = (int) (r.getMinY() - r1.getMinY()); // firstJ is the first y-pixel to iterate from
-			int bp1XHelper = (int) (r1.getMinX() - r2.getMinX()); // helper variables to use when referring to collision
-																	// object
-			int bp1YHelper = (int) (r1.getMinY() - r2.getMinY());
-
-			for (int i = firstI; i < r.getWidth() + firstI; i++) { //
-				for (int j = firstJ; j < r.getHeight() + firstJ; j++) {
-					if ((b1.getRGB(i, j) & 0xFF000000) != 0x00
-							&& (b2.getRGB(i + bp1XHelper, j + bp1YHelper) & 0xFF000000) != 0x00) {
-						eaten = true;
-						break;
-					} else {
-						eaten = false;
-					}
-				}
-			}
+			return true;
+		}else {
+			return false;
 		}
 	}
 }
