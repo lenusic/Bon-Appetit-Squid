@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 public class Fish {
 	private Image fish;
 	private int xLoc = 0, yLoc = 0;
-	private boolean isVisible;
+	public boolean isVisible;
 	
 	public Fish(int initialWidth, int initialHeight, String image) {
 		fish = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource(image));

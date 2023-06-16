@@ -332,7 +332,7 @@ public class Constants implements ActionListener, KeyListener {
 
 		while (loopVar) {
 			if ((System.currentTimeMillis() - startTime) > UPDATE_DIFFERENCE) {
-				System.out.println(">>> Loop gamePlay:" + gamePlay);
+				// System.out.println(">>> Loop gamePlay:" + gamePlay);
 				// check if a set of corals has left the screen
 				// if so, reset the coral's X location and assign a new Y location
 				if (xLoc1 < (0 - CORAL_WIDTH)) {
@@ -346,12 +346,15 @@ public class Constants implements ActionListener, KeyListener {
 				if (xLocFish1 < (0 - FISH_WIDTH)) {
 					xLocFish1 = SCREEN_WIDTH / 5 + SCREEN_DELAY;
 					fishY1 = fishLoc();
+					fish1.setVisible(true);
 				} else if (xLocFish2 < (0 - FISH_WIDTH)) {
 					xLocFish2 = SCREEN_WIDTH;
 					fishY2 = fishLoc();
+					fish2.setVisible(true);
 				} else if (xLocFish3 < (0 - FISH_WIDTH)) {
 					xLocFish3 = SCREEN_WIDTH;
 					fishY3 = fishLoc();
+					fish3.setVisible(true);
 				}
 
 				// decrement the coral locations by the predetermined amount
@@ -421,7 +424,7 @@ public class Constants implements ActionListener, KeyListener {
 					collisionDetection(bc1, bc2, tc1, tc2, squid);
 					updateScore(bc1, bc2, squid);
 					updateSpeed(bc1, bc2, squid);
-					updateFoodScore(fish1, fish2, fish3, squid);
+ 					updateFoodScore(fish1, fish2, fish3, squid);
 				}
 
 				// update pgs's JPanel
@@ -476,8 +479,9 @@ public class Constants implements ActionListener, KeyListener {
 
 	private void updateFoodScore(Fish f1, Fish f2, Fish f3, Squid squid) {
 		if (f1.getX() < squid.getX()
-				&& f1.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE) {
-			pgs.incrementFood();
+				&& f1.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE
+				&& f1.isVisible) {
+     			pgs.incrementFood();
 			f1.setVisible(false);
 		} else if (f2.getX() < squid.getX()
 				&& f2.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE) {
@@ -528,7 +532,9 @@ public class Constants implements ActionListener, KeyListener {
 	}
 
 	private void collisionFood(Fish f1, Fish f2, Fish f3, Squid squid) {
-		collisionHelperFood(squid.getRectangle(), f1.getRectangle(), squid.getBI(), f1.getBI());
+		if(f1.isVisible){
+			collisionHelperFood(squid.getRectangle(), f1.getRectangle(), squid.getBI(), f1.getBI());
+		}
 		collisionHelperFood(squid.getRectangle(), f2.getRectangle(), squid.getBI(), f2.getBI());
 		collisionHelperFood(squid.getRectangle(), f3.getRectangle(), squid.getBI(), f3.getBI());
 	}
