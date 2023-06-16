@@ -25,7 +25,8 @@ public class Constants implements ActionListener, KeyListener {
 	private static final int SQUID_WIDTH = 120, SQUID_HEIGHT = 75;
 	private static final int UPDATE_DIFFERENCE = 25; // time in ms between updates
 	private static int X_MOVEMENT_DIFFERENCE = 5; // distance the corals move every update
-	private static final int SCREEN_DELAY = 300; // needed because of long load times forcing corals to pop up mid-screen
+	private static final int SCREEN_DELAY = 300; // needed because of long load times forcing corals to pop up
+													// mid-screen
 	private static final int SQUID_X_LOCATION = SCREEN_WIDTH / 7;
 	private static final int SQUID_JUMP_DIFF = 10, SQUID_FALL_DIFF = SQUID_JUMP_DIFF / 2,
 			SQUID_JUMP_HEIGHT = CORALS_GAP - SQUID_HEIGHT - SQUID_JUMP_DIFF * 2;
@@ -44,8 +45,9 @@ public class Constants implements ActionListener, KeyListener {
 	// global swing objects
 	private JFrame frame = new JFrame("Limber Squid");
 	private static JButton startGame, restartGame;
+	private JButton gameoverLabel;
 	private JPanel topPanel; // declared globally to accommodate the repaint operation and allow for
-							 // removeAll(), etc.
+								// removeAll(), etc.
 
 	// other global objects
 	private static Constants tc = new Constants();
@@ -77,17 +79,18 @@ public class Constants implements ActionListener, KeyListener {
 	}
 
 	/**
-	 * Sets squid location to the right place, should be called on start and on restart
+	 * Sets squid location to the right place, should be called on start and on
+	 * restart
 	 */
-	public void squidRespawn(){
+	public void squidRespawn() {
 		squidYTracker = SCREEN_HEIGHT / 2 - SQUID_HEIGHT;
 		System.out.println("Squid respawned");
 	}
 
 	// add Start Game JButton
-	private void addStartButton(){
+	private void addStartButton() {
 		startGame = new JButton("Start");
-		startGame.setForeground(new Color(0, 255, 0));
+		startGame.setForeground(new Color(250, 60, 80));
 		startGame.setFocusable(false); // rather than just setFocusabled(false)
 		startGame.setFont(new Font("Tahoma", Font.BOLD, 42));
 		startGame.setBorderPainted(false);
@@ -102,7 +105,7 @@ public class Constants implements ActionListener, KeyListener {
 	}
 
 	// add Restart game JButton
-	private void addRestartButton(){
+	private void addRestartButton() {
 		restartGame = new JButton("Restart");
 		restartGame.setForeground(new Color(0, 255, 127));
 		restartGame.setFocusable(false);
@@ -112,10 +115,30 @@ public class Constants implements ActionListener, KeyListener {
 		restartGame.setFocusPainted(false);
 		restartGame.setOpaque(false);
 		restartGame.setAlignmentX(0.5f); // center horizontally on-screen
-		restartGame.setAlignmentY(0.01f); // center vertically on-screen
+		restartGame.setAlignmentY(0.09f); // center vertically on-screen
 		restartGame.addActionListener(this);
 		restartGame.setVisible(true);
 		topPanel.add(restartGame);
+	}
+
+	private void addGamoverText() {
+		gameoverLabel = new JButton();
+		gameoverLabel.setText("GAME OVER");
+
+		gameoverLabel.setForeground(new Color(200, 40, 60));
+		gameoverLabel.setFocusable(false);
+		gameoverLabel.setFont(new Font("Tahoma", Font.BOLD, 42));
+		gameoverLabel.setBorderPainted(false);
+		gameoverLabel.setContentAreaFilled(false);
+		gameoverLabel.setFocusPainted(false);
+		gameoverLabel.setOpaque(false);
+		gameoverLabel.setAlignmentX(0.5f); // center horizontally on-screen
+		gameoverLabel.setAlignmentY(1.0f); // center vertically on-screen
+		gameoverLabel.addActionListener(this);
+		gameoverLabel.setVisible(true);
+		// gameoverLabel.setLocation(0,0);
+
+		topPanel.add(gameoverLabel);
 	}
 
 	private JPanel createContentPane() {
@@ -124,13 +147,14 @@ public class Constants implements ActionListener, KeyListener {
 		LayoutManager overlay = new OverlayLayout(topPanel);
 		topPanel.setLayout(overlay);
 
-		if(gameOver== true)
+		if (gameOver == true) {
+			addGamoverText();
 			addRestartButton();
-		else
+		} else {
 			addStartButton();
-			
+		}
 
-		// must add last to ensure button's visibility. 
+		// must add last to ensure button's visibility.
 		// UPD: not button, it appends the moving background(pgs) to the topPanel
 		pgs = new GameScreen(SCREEN_WIDTH, SCREEN_HEIGHT, true); // true --> we want pgs to be the splash screen
 		topPanel.add(pgs);
@@ -165,7 +189,7 @@ public class Constants implements ActionListener, KeyListener {
 			loopVar = false;
 			gamePlay = true; // ???
 
-			fadeOperation(); 
+			fadeOperation();
 		} else if (e.getSource() == buildComplete) {
 			Thread t = new Thread() {
 				public void run() {
@@ -181,8 +205,8 @@ public class Constants implements ActionListener, KeyListener {
 			loopVar = false;
 			gamePlay = true;
 			squidRespawn();
-			fadeOperation(); 
-		} 
+			fadeOperation();
+		}
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -197,7 +221,7 @@ public class Constants implements ActionListener, KeyListener {
 		} else if (e.getKeyCode() == KeyEvent.VK_B && gamePlay == false) {
 			squidYTracker = SCREEN_HEIGHT / 2 - SQUID_HEIGHT; // need to reset the squid's starting height
 			squidThrust = false; // if user presses SPACE before collision and a collision occurs before reaching
-								// max height, you get residual jump, so this is preventative
+									// max height, you get residual jump, so this is preventative
 			actionPerformed(new ActionEvent(startGame, -1, ""));
 		}
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -293,7 +317,6 @@ public class Constants implements ActionListener, KeyListener {
 		Fish fish2 = new Fish(60, 40, "resources/fish2.png");
 		Fish fish3 = new Fish(60, 40, "resources/yellow-fish.png");
 
-
 		// variables to track x and y image locations for the bottom coral
 		int xLoc1 = SCREEN_WIDTH + SCREEN_DELAY,
 				xLoc2 = (int) ((double) 3.0 / 2.0 * SCREEN_WIDTH + CORAL_WIDTH / 2.0) + SCREEN_DELAY;
@@ -319,16 +342,14 @@ public class Constants implements ActionListener, KeyListener {
 					xLoc2 = SCREEN_WIDTH;
 					yLoc2 = generateBottomCoralLocation();
 				}
-				
+
 				if (xLocFish1 < (0 - FISH_WIDTH)) {
 					xLocFish1 = SCREEN_WIDTH / 5 + SCREEN_DELAY;
 					fishY1 = fishLoc();
-				}
-				else if (xLocFish2 < (0 - FISH_WIDTH)) {
+				} else if (xLocFish2 < (0 - FISH_WIDTH)) {
 					xLocFish2 = SCREEN_WIDTH;
 					fishY2 = fishLoc();
-				}
-				else if (xLocFish3 < (0 - FISH_WIDTH)) {
+				} else if (xLocFish3 < (0 - FISH_WIDTH)) {
 					xLocFish3 = SCREEN_WIDTH;
 					fishY3 = fishLoc();
 				}
@@ -336,7 +357,7 @@ public class Constants implements ActionListener, KeyListener {
 				// decrement the coral locations by the predetermined amount
 				xLoc1 -= X_MOVEMENT_DIFFERENCE;
 				xLoc2 -= X_MOVEMENT_DIFFERENCE;
-				
+
 				xLocFish1 -= X_MOVEMENT_DIFFERENCE;
 				xLocFish2 -= X_MOVEMENT_DIFFERENCE;
 				xLocFish3 -= X_MOVEMENT_DIFFERENCE;
@@ -394,7 +415,8 @@ public class Constants implements ActionListener, KeyListener {
 				pgs.setFish(fish1, fish2, fish3);
 				collisionFood(fish1, fish2, fish3, squid);
 
-				if (!isSplash && squid.getWidth() != -1) { // need the second part because if squid not on-screen, cannot
+				if (!isSplash && squid.getWidth() != -1) { // need the second part because if squid not on-screen,
+															// cannot
 															// get image width and have cascading error in collision
 					collisionDetection(bc1, bc2, tc1, tc2, squid);
 					updateScore(bc1, bc2, squid);
@@ -425,7 +447,7 @@ public class Constants implements ActionListener, KeyListener {
 		}
 		return temp;
 	}
-	
+
 	private int fishLoc() {
 		int temp = 0;
 		// iterate until temp is a value that allows both corals to be onscreen
@@ -438,37 +460,38 @@ public class Constants implements ActionListener, KeyListener {
 	/**
 	 * Method that checks whether the score needs to be updated
 	 * 
-	 * @param bc1  First BottomCoral object
-	 * @param bc2  Second BottomCoral object
+	 * @param bc1   First BottomCoral object
+	 * @param bc2   Second BottomCoral object
 	 * @param squid Squid object
 	 */
 	private void updateScore(BottomCoral bc1, BottomCoral bc2, Squid squid) {
-		if (bc1.getX() + CORAL_WIDTH < squid.getX() && bc1.getX() + CORAL_WIDTH > squid.getX() - X_MOVEMENT_DIFFERENCE) {
+		if (bc1.getX() + CORAL_WIDTH < squid.getX()
+				&& bc1.getX() + CORAL_WIDTH > squid.getX() - X_MOVEMENT_DIFFERENCE) {
 			pgs.incrementJump();
 		} else if (bc2.getX() + CORAL_WIDTH < squid.getX()
 				&& bc2.getX() + CORAL_WIDTH > squid.getX() - X_MOVEMENT_DIFFERENCE) {
 			pgs.incrementJump();
 		}
 	}
-	
+
 	private void updateFoodScore(Fish f1, Fish f2, Fish f3, Squid squid) {
-		if (f1.getX()< squid.getX()
-				&& f1.getX()> squid.getX() - X_MOVEMENT_DIFFERENCE) {
+		if (f1.getX() < squid.getX()
+				&& f1.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE) {
 			pgs.incrementFood();
 			f1.setVisible(false);
-		} else if (f2.getX()< squid.getX()
+		} else if (f2.getX() < squid.getX()
 				&& f2.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE) {
 			pgs.incrementFood();
 			f2.setVisible(false);
-		}else if (f3.getX() < squid.getX()
+		} else if (f3.getX() < squid.getX()
 				&& f3.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE) {
 			pgs.incrementFood();
 			f3.setVisible(false);
 		}
 	}
-	
+
 	private void updateSpeed(BottomCoral bc1, BottomCoral bc2, Squid squid) {
-		if(pgs.speedUp()) {
+		if (pgs.speedUp()) {
 			X_MOVEMENT_DIFFERENCE += 5;
 		}
 	}
@@ -476,10 +499,10 @@ public class Constants implements ActionListener, KeyListener {
 	/**
 	 * Method to test whether a collision has occurred
 	 * 
-	 * @param bc1  First BottomCoral object
-	 * @param bc2  Second BottomCoral object
-	 * @param tc1  First TopCoral object
-	 * @param tc2  Second TopCoral object
+	 * @param bc1   First BottomCoral object
+	 * @param bc2   Second BottomCoral object
+	 * @param tc1   First TopCoral object
+	 * @param tc2   Second TopCoral object
 	 * @param squid Squid object
 	 */
 	private void collisionDetection(BottomCoral bc1, BottomCoral bc2, TopCoral tc1, TopCoral tc2, Squid squid) {
@@ -489,38 +512,26 @@ public class Constants implements ActionListener, KeyListener {
 		collisionHelper(squid.getRectangle(), tc2.getRectangle(), squid.getBI(), tc2.getBI());
 
 		if (squid.getY() + SQUID_HEIGHT > SCREEN_HEIGHT * 7 / 8) { // ground detection
-			System.out.println("game over: " +  SCREEN_HEIGHT * 7 / 8);
+			System.out.println("game over: " + SCREEN_HEIGHT * 7 / 8);
 			System.out.println(squid.getY() + SQUID_HEIGHT);
-			pgs.sendText("Game Over");
 			gameOver = true;
-
-
 			loopVar = false;
 			gamePlay = false; // game has ended
-
-
 			tc.buildFrame(); // fixes the adding restart button but spoils pgs.sendText()
-		} else if(squid.getY() + SQUID_HEIGHT < 100) { //ceiling detection
-			pgs.sendText("Too close to the surface. Game Over :(");
-			// showRestartButton();
-			restartGame.setVisible(true);
-			topPanel.revalidate();
-			topPanel.repaint();
+		} else if (squid.getY() + SQUID_HEIGHT < 100) { // ceiling detection
 			loopVar = false;
 			gamePlay = false; // game has ended
 			gameOver = true;
-
 			tc.buildFrame(); // fixes the adding restart button but spoils pgs.sendText()
-		}		
+		}
 
 	}
-	
+
 	private void collisionFood(Fish f1, Fish f2, Fish f3, Squid squid) {
 		collisionHelperFood(squid.getRectangle(), f1.getRectangle(), squid.getBI(), f1.getBI());
 		collisionHelperFood(squid.getRectangle(), f2.getRectangle(), squid.getBI(), f2.getBI());
 		collisionHelperFood(squid.getRectangle(), f3.getRectangle(), squid.getBI(), f3.getBI());
 	}
-
 
 	/**
 	 * Helper method to test the Squid object's potential collision with a coral
@@ -545,16 +556,17 @@ public class Constants implements ActionListener, KeyListener {
 				for (int j = firstJ; j < r.getHeight() + firstJ; j++) {
 					if ((b1.getRGB(i, j) & 0xFF000000) != 0x00
 							&& (b2.getRGB(i + bp1XHelper, j + bp1YHelper) & 0xFF000000) != 0x00) {
-                        pgs.sendText("Game Over");
-                        loopVar = false; // stop the game loop
-                        gamePlay = false; // game has ended
-                        break;
+						// pgs.sendText("Game Over");
+						gameOver = true;
+						loopVar = false; // stop the game loop
+						gamePlay = false; // game has ended
+						tc.buildFrame();
 					}
 				}
 			}
 		}
 	}
-	
+
 	private void collisionHelperFood(Rectangle r1, Rectangle r2, BufferedImage b1, BufferedImage b2) {
 		if (r1.intersects(r2)) {
 			Rectangle r = r1.intersection(r2);
@@ -571,7 +583,7 @@ public class Constants implements ActionListener, KeyListener {
 							&& (b2.getRGB(i + bp1XHelper, j + bp1YHelper) & 0xFF000000) != 0x00) {
 						eaten = true;
 						break;
-					}else {
+					} else {
 						eaten = false;
 					}
 				}
