@@ -23,6 +23,7 @@ public class GameScreen extends JPanel {
 	private TopCoral tc1, tc2;
 	private Squid squid;
 	private Fish fish1, fish2, fish3;
+	private Enemy enemy;
 
 	/**
 	 * Default constructor for the GameScreen class
@@ -59,6 +60,10 @@ public class GameScreen extends JPanel {
 			if(fish3.isVisible()) {
 				g.drawImage(fish3.getFish(), fish3.getX(), fish3.getY(), null);
 			}
+			if(enemy.isVisible()) {
+				g.drawImage(enemy.getEnemy(), enemy.getX(), enemy.getY(), null);
+			}
+
 		}
 
 		if (!isSplash && squid != null) {
@@ -109,7 +114,7 @@ public class GameScreen extends JPanel {
 	}
 
 	/**
-	 * Parsing method for GameScreen's global Squid variable
+	 * Parsing method for GameScreen's global variables
 	 * 
 	 * @param squid The Squid object
 	 */
@@ -122,6 +127,11 @@ public class GameScreen extends JPanel {
 		this.fish2 = fish2;
 		this.fish3 = fish3;
 	}
+	
+	public void setEnemy(Enemy enemy) {
+		this.enemy = enemy;
+	}
+
 
 	/**
 	 * Method called to invoke an increase in the variable tracking the current jump
