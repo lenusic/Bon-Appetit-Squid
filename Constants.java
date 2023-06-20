@@ -21,6 +21,7 @@ public class Constants implements ActionListener, KeyListener {
 	private static final int FISH_WIDTH = SCREEN_WIDTH / 2;
 	private static final int SQUID_WIDTH = 120, SQUID_HEIGHT = 75;
 	private static final int ENEMY_WIDTH = SCREEN_WIDTH / 2;
+	private static final int SHIELD_WIDTH = SQUID_WIDTH + 100, SHIELD_HEIGHT = SQUID_HEIGHT + 100;
 
 	private static final int UPDATE_DIFFERENCE = 25; // time in ms between updates
 	private static int X_MOVEMENT_DIFFERENCE = 5; // distance the corals move every update
@@ -320,6 +321,8 @@ public class Constants implements ActionListener, KeyListener {
 
 		Enemy enemy = new Enemy(180, 90, "resources/seal.png");
 
+		Shield shield = new Shield(SHIELD_WIDTH, SHIELD_HEIGHT);
+
 		// variables to track x and y image locations
 		int squidX = SQUID_X_LOCATION, squidY = squidYTracker;
 		int xLoc1 = SCREEN_WIDTH + SCREEN_DELAY,
@@ -343,9 +346,13 @@ public class Constants implements ActionListener, KeyListener {
 				if (xLoc1 < (0 - CORAL_WIDTH)) {
 					xLoc1 = SCREEN_WIDTH;
 					yLoc1 = generateBottomCoralLocation();
+					bc1.setVisible(true);
+					tc1.setVisible(true);
 				} else if (xLoc2 < (0 - CORAL_WIDTH)) {
 					xLoc2 = SCREEN_WIDTH;
 					yLoc2 = generateBottomCoralLocation();
+					bc2.setVisible(true);
+					tc2.setVisible(true);
 				}
 				if (xLocFish1 < (0 - FISH_WIDTH)) {
 					xLocFish1 = SCREEN_WIDTH / 5 + SCREEN_DELAY;
@@ -421,6 +428,9 @@ public class Constants implements ActionListener, KeyListener {
 						squid.setX(squidX);
 						squid.setY(squidY);
 						pgs.setSquid(squid);
+						shield.setX(squidX - (SQUID_WIDTH/2));
+						shield.setY(squidY - (SQUID_HEIGHT/2));
+						pgs.setShield(shield);
 					}
 
 					// set the BottomCoral and TopCoral local variables in GameScreen by parsing
@@ -433,11 +443,11 @@ public class Constants implements ActionListener, KeyListener {
 					if (!isSplash && squid.getWidth() != -1) { // need the second part because if squid not on-screen,
 																// cannot
 																// get image width and have cascading error in collision
-						collisionDetection(bc1, bc2, tc1, tc2, squid);
+						collisionDetection(bc1, bc2, tc1, tc2, squid, shield);
 						updateScore(bc1, bc2, squid);
 						updateSpeed(bc1, bc2, squid);
 						collisionFood(fish1, fish2, fish3, squid);
-						collisionEnemy(enemy, squid);
+						collisionEnemy(enemy, squid, shield);
 					}
 
 					// update pgs's JPanel
@@ -531,12 +541,9 @@ public class Constants implements ActionListener, KeyListener {
 	 * @param tc2   Second TopCoral object
 	 * @param squid Squid object
 	 */
-	private void collisionDetection(BottomCoral bc1, BottomCoral bc2, TopCoral tc1, TopCoral tc2, Squid squid) {
-		collisionHelper(squid.getRectangle(), bc1.getRectangle(), squid.getBI(), bc1.getBI());
-		collisionHelper(squid.getRectangle(), bc2.getRectangle(), squid.getBI(), bc2.getBI());
-		collisionHelper(squid.getRectangle(), tc1.getRectangle(), squid.getBI(), tc1.getBI());
-		collisionHelper(squid.getRectangle(), tc2.getRectangle(), squid.getBI(), tc2.getBI());
-
+	private void collisionDetection(BottomCoral bc1, BottomCoral bc2, TopCoral tc1, TopCoral tc2, Squid squid, Shield shield) {
+		collisionCoral(squid, tc1, bc1, shield);
+		collisionCoral(squid, tc2, bc2, shield);
 		if (squid.getY() + SQUID_HEIGHT > SCREEN_HEIGHT * 7 / 8) { // ground detection
 			gameOver = true;
 			loopVar = false;
@@ -549,6 +556,24 @@ public class Constants implements ActionListener, KeyListener {
 			tc.buildFrame(); // fixes the adding restart button but spoils pgs.sendText()
 		}
 
+	}
+
+	private void collisionCoral(Squid squid, TopCoral tc, BottomCoral bc, Shield shield) {
+		boolean isCollide;
+		if(bc.isVisible()){
+			isCollide = collisionHelper(squid.getRectangle(), bc.getRectangle(), squid.getBI(), bc.getBI(), shield);
+			if(isCollide && shield.isVisible()){
+					bc.setVisible(false);
+					shield.setVisible(false);
+				}
+		}
+		if(tc.isVisible()){
+			isCollide = collisionHelper(squid.getRectangle(), tc.getRectangle(), squid.getBI(), tc.getBI(), shield);
+			if(isCollide && shield.isVisible()){
+					tc.setVisible(false);
+					shield.setVisible(false);
+				}
+		}
 	}
 
 	private void collisionFood(Fish f1, Fish f2, Fish f3, Squid squid) {
@@ -566,8 +591,14 @@ public class Constants implements ActionListener, KeyListener {
 		}
 	}
 
-	private void collisionEnemy(Enemy enemy, Squid squid) {
-		collisionHelper(squid.getRectangle(), enemy.getRectangle(), squid.getBI(), enemy.getBI());
+	private void collisionEnemy(Enemy enemy, Squid squid, Shield shield) {
+		if(enemy.isVisible){
+			boolean isCollide = collisionHelper(squid.getRectangle(), enemy.getRectangle(), squid.getBI(), enemy.getBI(), shield);
+			if(isCollide && shield.isVisible()){
+				enemy.setVisible(false);
+				shield.setVisible(false);
+			}
+		}
 	}
 
 	/**
@@ -578,7 +609,7 @@ public class Constants implements ActionListener, KeyListener {
 	 * @param b1 The Squid's BufferedImage component
 	 * @param b2 Collision component BufferedImage
 	 */
-	private void collisionHelper(Rectangle r1, Rectangle r2, BufferedImage b1, BufferedImage b2) {
+	private boolean collisionHelper(Rectangle r1, Rectangle r2, BufferedImage b1, BufferedImage b2, Shield shield) {
 		if (r1.intersects(r2)) {
 			Rectangle r = r1.intersection(r2);
 
@@ -592,15 +623,19 @@ public class Constants implements ActionListener, KeyListener {
 				for (int j = firstJ; j < r.getHeight() + firstJ; j++) {
 					if ((b1.getRGB(i, j) & 0xFF000000) != 0x00
 							&& (b2.getRGB(i + bp1XHelper, j + bp1YHelper) & 0xFF000000) != 0x00) {
-						// pgs.sendText("Game Over");
-						gameOver = true;
-						loopVar = false; // stop the game loop
-						gamePlay = false; // game has ended
-						tc.buildFrame();
+						if(!shield.isVisible()){
+							// pgs.sendText("Game Over");
+							gameOver = true;
+							loopVar = false; // stop the game loop
+							gamePlay = false; // game has ended
+							tc.buildFrame();
+						}
+						return true;
 					}
 				}
 			}
 		}
+		return false;
 	}
 
 	private boolean collisionHelperFood(Rectangle r1, Rectangle r2, BufferedImage b1, BufferedImage b2) {
