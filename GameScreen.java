@@ -24,6 +24,7 @@ public class GameScreen extends JPanel {
 	private Squid squid;
 	private Fish fish1, fish2, fish3;
 	private Enemy enemy;
+	private Shield shield;
 
 	/**
 	 * Default constructor for the GameScreen class
@@ -68,6 +69,9 @@ public class GameScreen extends JPanel {
 
 		if (!isSplash && squid != null) {
 			g.drawImage(squid.getSquid(), squid.getX(), squid.getY(), null);
+			if(shield.isVisible()){
+				g.drawImage(shield.getShield(), shield.getX(), shield.getY(), null);
+			}
 		}
 
 		// needed in case the primary font does not exist
@@ -130,6 +134,10 @@ public class GameScreen extends JPanel {
 	
 	public void setEnemy(Enemy enemy) {
 		this.enemy = enemy;
+	}
+
+	public void setShield(Shield shield) {
+		this.shield = shield;
 	}
 
 
