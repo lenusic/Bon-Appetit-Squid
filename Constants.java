@@ -10,8 +10,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import javax.swing.border.Border;
 
@@ -306,7 +313,7 @@ public class Constants implements ActionListener, KeyListener {
 		};
 		t.start();
 	}
-
+	
 	/**
 	 * Method that performs the splash screen graphics movements
 	 */
@@ -334,6 +341,19 @@ public class Constants implements ActionListener, KeyListener {
 		long startTime = System.currentTimeMillis();
 
 		while (loopVar) {
+			try
+	        {
+	            Audio audioPlayer = new Audio();
+	              
+	            audioPlayer.play();
+	        } 
+	          
+	        catch (Exception ex) 
+	        {
+	            System.out.println("Error with playing sound.");
+	            ex.printStackTrace();
+	          
+	          }
 			if ((System.currentTimeMillis() - startTime) > UPDATE_DIFFERENCE) {
 				// System.out.println(">>> Loop gamePlay:" + gamePlay);
 				// check if a set of corals has left the screen

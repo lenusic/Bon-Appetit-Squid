@@ -137,7 +137,7 @@ public class GameScreen extends JPanel {
 	}
 	
 	public boolean speedUp() {
-		if(successfulJumps != 0 && successfulJumps % 10 == 0) {
+		if(successfulJumps != 0 && successfulJumps % 5 == 0) {
 			return true;
 		}else {
 			return false;
