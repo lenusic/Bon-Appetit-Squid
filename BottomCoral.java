@@ -8,6 +8,7 @@ public class BottomCoral {
 	// global variables
 	private Image bottomCoral;
 	private int xLoc = 0, yLoc = 0;
+	private boolean isVisible = true;
 
 	/**
 	 * Default constructor
@@ -115,5 +116,21 @@ public class BottomCoral {
 		g.drawImage(bottomCoral, 0, 0, null);
 		g.dispose();
 		return bi;
+	}
+
+	/**
+	 * Method to get the value of the isVisible boolean for the Shield
+	 * @return boolean
+	 */
+	public boolean isVisible() {
+		return isVisible;
+	}
+
+	/**
+	 * Method to set the value of the isVisible boolean for the Shield
+	 * @param visible
+	 */
+	public void setVisible(boolean visible) {
+		this.isVisible = visible;
 	}
 }
