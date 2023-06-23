@@ -1,5 +1,7 @@
 import java.awt.Dimension;
+import java.awt.DisplayMode;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Color;
 import java.awt.LayoutManager;
@@ -14,8 +16,8 @@ import javax.swing.*;
 
 public class Constants implements ActionListener, KeyListener {
 	// global constant variables
-	private static final int SCREEN_WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-	private static final int SCREEN_HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+	private static int SCREEN_WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+	private static int SCREEN_HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 	private static final int CORALS_GAP = SCREEN_HEIGHT / 5; // distance in pixels between corals
 	private static final int CORAL_WIDTH = SCREEN_WIDTH / 8, CORAL_HEIGHT = 4 * CORAL_WIDTH;
 	private static final int FISH_WIDTH = SCREEN_WIDTH / 2;
@@ -54,13 +56,17 @@ public class Constants implements ActionListener, KeyListener {
 
 	// other global objects
 	private static Constants tc = new Constants();
-	private static GameScreen pgs; // panel that has the moving background at the start of the game
+	private static GameScreen pgs = new GameScreen(SCREEN_WIDTH, SCREEN_HEIGHT, true); // panel that has the moving background at the start of the game
 
 	/**
 	 * Default constructor
 	 */
 	public Constants() {
-
+		for (DisplayMode mode : GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayModes())
+			{
+			if(SCREEN_WIDTH != mode.getWidth()) SCREEN_WIDTH = mode.getWidth();
+			if(SCREEN_HEIGHT != mode.getHeight()) SCREEN_HEIGHT = mode.getHeight();
+			}
 	}
 
 	public static void main(String[] args) {
