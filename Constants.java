@@ -44,7 +44,7 @@ public class Constants implements ActionListener, KeyListener {
 	private boolean eatenFish1 = false;
 	private boolean eatenFish2 = false;
 	private boolean eatenFish3 = false;
-
+	private boolean spedUp = false;
 	private boolean gameOver = false;
 
 	// global swing objects
@@ -219,6 +219,7 @@ public class Constants implements ActionListener, KeyListener {
 			gamePlay = true;
 			squidRespawn();
 			fadeOperation();
+			X_MOVEMENT_DIFFERENCE = 5;
 		}
 	}
 
@@ -456,7 +457,7 @@ public class Constants implements ActionListener, KeyListener {
 															// get image width and have cascading error in collision
 					collisionDetection(bc1, bc2, tc1, tc2, squid, shield);
 					updateScore(bc1, bc2, squid);
-					updateSpeed(bc1, bc2, squid);
+					updateSpeed();
 					collisionFood(fish1, fish2, fish3, squid);
 					collisionEnemy(enemy, squid, shield);
 				}
@@ -537,9 +538,11 @@ public class Constants implements ActionListener, KeyListener {
 		}
 	}
 
-	private void updateSpeed(BottomCoral bc1, BottomCoral bc2, Squid squid) {
-		if (pgs.speedUp()) {
-			X_MOVEMENT_DIFFERENCE += 5;
+	private void updateSpeed() {
+		if (pgs.speedUp() && !spedUp) {
+			X_MOVEMENT_DIFFERENCE += 3;
+			spedUp = true;
+			System.out.println(X_MOVEMENT_DIFFERENCE);
 		}
 	}
 
