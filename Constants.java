@@ -26,13 +26,10 @@ public class Constants implements ActionListener, KeyListener {
 	private static final int SHIELD_WIDTH = SQUID_WIDTH + 100, SHIELD_HEIGHT = SQUID_HEIGHT + 100;
 
 	private static final int UPDATE_DIFFERENCE = 25; // time in ms between updates
-	private int X_MOVEMENT_DIFFERENCE = 5; // distance the corals move every update
+	private static int X_MOVEMENT_DIFFERENCE = 5; // distance the corals move every update
 	private static final int SCREEN_DELAY = 300; // needed because of long load times forcing corals to pop up
 													// mid-screen
-	private int SQUID_X_LOCATION =SCREEN_WIDTH / 7;;
-	private boolean moveLeft = false;
-	private boolean moveRight = false;
-
+	private static final int SQUID_X_LOCATION = SCREEN_WIDTH / 7;
 	private static final int SQUID_JUMP_DIFF = 10, SQUID_FALL_DIFF = SQUID_JUMP_DIFF / 2,
 			SQUID_JUMP_HEIGHT = CORALS_GAP - SQUID_HEIGHT - SQUID_JUMP_DIFF * 2;
 
@@ -47,7 +44,7 @@ public class Constants implements ActionListener, KeyListener {
 	private boolean eatenFish1 = false;
 	private boolean eatenFish2 = false;
 	private boolean eatenFish3 = false;
-
+	private boolean spedUp = false;
 	private boolean gameOver = false;
 
 	// global swing objects
@@ -99,9 +96,6 @@ public class Constants implements ActionListener, KeyListener {
 	 * Sets squid location to the right place, should be called on start and on
 	 * restart
 	 */
-	private void resetSquidXLocation() {
-		SQUID_X_LOCATION = SCREEN_WIDTH / 7;;
-	}
 	public void squidRespawn() {
 		squidYTracker = SCREEN_HEIGHT / 2 - SQUID_HEIGHT;
 		System.out.println("Squid respawned");
@@ -224,13 +218,12 @@ public class Constants implements ActionListener, KeyListener {
 			loopVar = false;
 			gamePlay = true;
 			squidRespawn();
-			resetSquidXLocation();
 			fadeOperation();
+			X_MOVEMENT_DIFFERENCE = 5;
 		}
 	}
 
 	public void keyPressed(KeyEvent e) {
-
 		if (e.getKeyCode() == KeyEvent.VK_SPACE && gamePlay == true && released == true) {
 			// update a boolean that's tested in game loop to move the squid
 			if (squidThrust) { // need this to register the button press and reset the squidYTracker before the
@@ -239,10 +232,6 @@ public class Constants implements ActionListener, KeyListener {
 			}
 			squidThrust = true;
 			released = false;
-		} else if (e.getKeyCode() == KeyEvent.VK_LEFT && gamePlay == true && released == true) {
-			moveLeft = true;
-		}else if (e.getKeyCode() == KeyEvent.VK_RIGHT && gamePlay == true && released == true) {
-			moveRight = true;
 		} else if (e.getKeyCode() == KeyEvent.VK_B && gamePlay == false) {
 			squidYTracker = SCREEN_HEIGHT / 2 - SQUID_HEIGHT; // need to reset the squid's starting height
 			squidThrust = false; // if user presses SPACE before collision and a collision occurs before reaching
@@ -252,21 +241,13 @@ public class Constants implements ActionListener, KeyListener {
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			System.exit(0);
 		}
-		updateCharacterPosition();
 	}
 
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			released = true;
-		}else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			moveLeft = false;
-		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			moveRight = false;
 		}
-
-		updateCharacterPosition();
 	}
-
 
 	public void keyTyped(KeyEvent e) {
 	}
@@ -355,8 +336,7 @@ public class Constants implements ActionListener, KeyListener {
 		Shield shield = new Shield(SHIELD_WIDTH, SHIELD_HEIGHT);
 
 		// variables to track x and y image locations
-		//int squidX = SQUID_X_LOCATION,
-		int squidY = squidYTracker;
+		int squidX = SQUID_X_LOCATION, squidY = squidYTracker;
 		int xLoc1 = SCREEN_WIDTH + SCREEN_DELAY,
 				xLoc2 = (int) ((double) 3.0 / 2.0 * SCREEN_WIDTH + CORAL_WIDTH / 2.0) + SCREEN_DELAY;
 		int yLoc1 = generateBottomCoralLocation(), yLoc2 = generateBottomCoralLocation();
@@ -405,7 +385,7 @@ public class Constants implements ActionListener, KeyListener {
 					enemy.setVisible(true);
 				}
 				// decrement locations by the predetermined amount
-				xLoc1 -= X_MOVEMENT_DIFFERENCE ;
+				xLoc1 -= X_MOVEMENT_DIFFERENCE;
 				xLoc2 -= X_MOVEMENT_DIFFERENCE;
 
 				xLocFish1 -= X_MOVEMENT_DIFFERENCE * 1.1;
@@ -457,10 +437,10 @@ public class Constants implements ActionListener, KeyListener {
 				enemy.setY(enemyY1);
 
 				if (!isSplash) {
-					squid.setX(SQUID_X_LOCATION);
+					squid.setX(squidX);
 					squid.setY(squidY);
 					pgs.setSquid(squid);
-					shield.setX(SQUID_X_LOCATION - (SQUID_WIDTH / 2));
+					shield.setX(squidX - (SQUID_WIDTH / 2));
 					shield.setY(squidY - (SQUID_HEIGHT / 2));
 					pgs.setShield(shield);
 				}
@@ -477,8 +457,7 @@ public class Constants implements ActionListener, KeyListener {
 															// get image width and have cascading error in collision
 					collisionDetection(bc1, bc2, tc1, tc2, squid, shield);
 					updateScore(bc1, bc2, squid);
-					updateSpeed(bc1, bc2, squid);
-					updateCharacterPosition();
+					updateSpeed();
 					collisionFood(fish1, fish2, fish3, squid);
 					collisionEnemy(enemy, squid, shield);
 				}
@@ -559,23 +538,14 @@ public class Constants implements ActionListener, KeyListener {
 		}
 	}
 
-	private void updateSpeed(BottomCoral bc1, BottomCoral bc2, Squid squid) {
-		if (pgs.speedUp()) {
-			X_MOVEMENT_DIFFERENCE += 5;
+	private void updateSpeed() {
+		if (pgs.speedUp() && !spedUp) {
+			X_MOVEMENT_DIFFERENCE += 3;
+			spedUp = true;
+			System.out.println(X_MOVEMENT_DIFFERENCE);
 		}
 	}
 
-	public void updateCharacterPosition() {
-		if (moveLeft) {
-			SQUID_X_LOCATION -= 10; // Move character left
-		}
-		if (moveRight) {
-			SQUID_X_LOCATION += 10; // Move character right
-		}
-		topPanel.revalidate();
-		topPanel.repaint();
-
-	}
 	/**
 	 * Method to test whether a collision has occurred
 	 * 
