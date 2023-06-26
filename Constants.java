@@ -45,6 +45,8 @@ public class Constants implements ActionListener, KeyListener {
 	private boolean eatenFish2 = false;
 	private boolean eatenFish3 = false;
 	private boolean spedUp = false;
+	private boolean activateShield = true; //true->shield can be activated, false->food score hasn't changed and shield should not be activated again
+
 	private boolean gameOver = false;
 
 	// global swing objects
@@ -452,15 +454,16 @@ public class Constants implements ActionListener, KeyListener {
 				pgs.setFish(fish1, fish2, fish3);
 				pgs.setEnemy(enemy);
 
-				if (!isSplash && squid.getWidth() != -1) { // need the second part because if squid not on-screen,
-															// cannot
-															// get image width and have cascading error in collision
-					collisionDetection(bc1, bc2, tc1, tc2, squid, shield);
-					updateScore(bc1, bc2, squid);
-					updateSpeed();
-					collisionFood(fish1, fish2, fish3, squid);
-					collisionEnemy(enemy, squid, shield);
-				}
+					if (!isSplash && squid.getWidth() != -1) { // need the second part because if squid not on-screen,
+																// cannot
+																// get image width and have cascading error in collision
+						collisionDetection(bc1, bc2, tc1, tc2, squid, shield);
+						updateScore(bc1, bc2, squid);
+						updateSpeed();
+						updateShield(shield);
+						collisionFood(fish1, fish2, fish3, squid);
+						collisionEnemy(enemy, squid, shield);
+					}
 
 				// update pgs's JPanel
 				topPanel.revalidate();
@@ -525,16 +528,19 @@ public class Constants implements ActionListener, KeyListener {
 				&& eatenFish1) {
 			pgs.incrementFood();
 			f1.setVisible(false);
+			activateShield = true;
 		}
 		if (f2.getX() < squid.getX()
 				&& f2.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE * 1.3 && eatenFish2) {
 			pgs.incrementFood();
 			f2.setVisible(false);
+			activateShield = true;
 		}
 		if (f3.getX() < squid.getX()
 				&& f3.getX() > squid.getX() - X_MOVEMENT_DIFFERENCE * 1.5 && eatenFish3) {
 			pgs.incrementFood();
 			f3.setVisible(false);
+			activateShield = true;
 		}
 	}
 
@@ -543,6 +549,12 @@ public class Constants implements ActionListener, KeyListener {
 			X_MOVEMENT_DIFFERENCE += 3;
 			spedUp = true;
 			System.out.println(X_MOVEMENT_DIFFERENCE);
+		}
+	}
+
+	private void updateShield(Shield shield){
+		if(activateShield && shield.getLastShieldEnd() + 5 == pgs.getFoodScore()){
+			shield.setVisible(true);
 		}
 	}
 
@@ -577,17 +589,21 @@ public class Constants implements ActionListener, KeyListener {
 		boolean isCollide;
 		if (bc.isVisible()) {
 			isCollide = collisionHelper(squid.getRectangle(), bc.getRectangle(), squid.getBI(), bc.getBI(), shield);
-			if (isCollide && shield.isVisible()) {
-				bc.setVisible(false);
-				shield.setVisible(false);
-			}
+			if(isCollide && shield.isVisible()){
+					bc.setVisible(false);
+					shield.setVisible(false);
+					shield.setLastShieldEnd(pgs.getFoodScore());
+					activateShield = false;
+				}
 		}
 		if (tc.isVisible()) {
 			isCollide = collisionHelper(squid.getRectangle(), tc.getRectangle(), squid.getBI(), tc.getBI(), shield);
-			if (isCollide && shield.isVisible()) {
-				tc.setVisible(false);
-				shield.setVisible(false);
-			}
+			if(isCollide && shield.isVisible()){
+					tc.setVisible(false);
+					shield.setVisible(false);
+					shield.setLastShieldEnd(pgs.getFoodScore());
+					activateShield = false;
+				}
 		}
 	}
 
@@ -613,6 +629,8 @@ public class Constants implements ActionListener, KeyListener {
 			if (isCollide && shield.isVisible()) {
 				enemy.setVisible(false);
 				shield.setVisible(false);
+				shield.setLastShieldEnd(pgs.getFoodScore());
+				activateShield = false;
 			}
 		}
 	}

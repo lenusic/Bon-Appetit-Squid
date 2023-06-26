@@ -6,7 +6,8 @@ public class Shield {
 	// global variables
 	private Image bubbleShield;
 	private int xLoc = 0, yLoc = 0;
-	private boolean isVisible = true;
+	private boolean isVisible = false;
+	private int lastShieldEnd = 0;
 
 	/**
 	 * Default constructor
@@ -120,5 +121,21 @@ public class Shield {
 	 */
 	public void setVisible(boolean visible) {
 		this.isVisible = visible;
+	}
+
+	/**
+	 * Method to get the value of the last Shiled End (food value when shiled was last deactivated)
+	 * @return int
+	 */
+	public int getLastShieldEnd(){
+		return lastShieldEnd;
+	}
+
+	/**
+	 * Method to set the value of lastShieldEnd
+	 * @param newEnd
+	 */
+	public void setLastShieldEnd(int newEnd){
+		this.lastShieldEnd = newEnd;
 	}
 }
