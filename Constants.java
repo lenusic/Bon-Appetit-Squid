@@ -592,6 +592,7 @@ public class Constants implements ActionListener, KeyListener {
 			if(isCollide && shield.isVisible()){
 					bc.setVisible(false);
 					shield.setVisible(false);
+					shield.setLastShieldEnd(pgs.getFoodScore());
 					activateShield = false;
 				}
 		}
@@ -600,6 +601,7 @@ public class Constants implements ActionListener, KeyListener {
 			if(isCollide && shield.isVisible()){
 					tc.setVisible(false);
 					shield.setVisible(false);
+					shield.setLastShieldEnd(pgs.getFoodScore());
 					activateShield = false;
 				}
 		}
@@ -627,6 +629,7 @@ public class Constants implements ActionListener, KeyListener {
 			if (isCollide && shield.isVisible()) {
 				enemy.setVisible(false);
 				shield.setVisible(false);
+				shield.setLastShieldEnd(pgs.getFoodScore());
 				activateShield = false;
 			}
 		}
