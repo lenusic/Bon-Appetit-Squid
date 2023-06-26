@@ -83,6 +83,13 @@ public class Constants implements ActionListener, KeyListener {
 
 	public static void main(String[] args) {
 
+		        Audio audioPlayer = new Audio("resources/the-squid-song.wav");
+
+		// Create and start the audio thread
+        Thread audioThread = new Thread(audioPlayer);
+        audioThread.start();
+        audioPlayer.play();
+
 		// build the GUI on a new thread
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -208,7 +215,7 @@ public class Constants implements ActionListener, KeyListener {
 			// stop the splash screen
 			loopVar = false;
 			gamePlay = true;
-
+			
 			fadeOperation();
 		} else if (e.getSource() == buildComplete) {
 			Thread t = new Thread() {
@@ -358,17 +365,6 @@ public class Constants implements ActionListener, KeyListener {
 		long startTime = System.currentTimeMillis();
 
 		while (loopVar) {
-			try {
-				Audio audioPlayer = new Audio();
-
-				audioPlayer.play();
-			}
-
-			catch (Exception ex) {
-				System.out.println("Error with playing sound.");
-				ex.printStackTrace();
-
-			}
 			if ((System.currentTimeMillis() - startTime) > UPDATE_DIFFERENCE) {
 				// check if a set of corals has left the screen
 				// if so, reset the coral's X location and assign a new Y location
