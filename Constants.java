@@ -44,7 +44,7 @@ public class Constants implements ActionListener, KeyListener {
 	private boolean eatenFish1 = false;
 	private boolean eatenFish2 = false;
 	private boolean eatenFish3 = false;
-
+	private boolean spedUp = false;
 	private boolean activateShield = true; //true->shield can be activated, false->food score hasn't changed and shield should not be activated again
 
 	private boolean gameOver = false;
@@ -58,17 +58,22 @@ public class Constants implements ActionListener, KeyListener {
 
 	// other global objects
 	private static Constants tc = new Constants();
-	private static GameScreen pgs = new GameScreen(SCREEN_WIDTH, SCREEN_HEIGHT, true); // panel that has the moving background at the start of the game
+	private static GameScreen pgs = new GameScreen(SCREEN_WIDTH, SCREEN_HEIGHT, true); // panel that has the moving
+																						// background at the start of
+																						// the game
 
 	/**
 	 * Default constructor
 	 */
 	public Constants() {
-		// for (DisplayMode mode : GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayModes())
-		// 	{
-		// 	if(SCREEN_WIDTH != mode.getWidth()) SCREEN_WIDTH = mode.getWidth();
-		// 	if(SCREEN_HEIGHT != mode.getHeight()) SCREEN_HEIGHT = mode.getHeight();
-		// 	}
+		// for (DisplayMode mode :
+		// GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+		// .getDisplayModes()) {
+		// if (SCREEN_WIDTH != mode.getWidth())
+		// SCREEN_WIDTH = mode.getWidth();
+		// if (SCREEN_HEIGHT != mode.getHeight())
+		// SCREEN_HEIGHT = mode.getHeight();
+		// }
 	}
 
 	public static void main(String[] args) {
@@ -216,6 +221,7 @@ public class Constants implements ActionListener, KeyListener {
 			gamePlay = true;
 			squidRespawn();
 			fadeOperation();
+			X_MOVEMENT_DIFFERENCE = 5;
 		}
 	}
 
@@ -341,7 +347,7 @@ public class Constants implements ActionListener, KeyListener {
 				xLocFish3 = (int) ((double) 3.0 / 2.0 * (SCREEN_WIDTH) + FISH_WIDTH / 2.0) + SCREEN_DELAY;
 		int fishY1 = fishLoc(), fishY2 = fishLoc(), fishY3 = fishLoc();
 		int enemyX1 = (int) ((double) 4.0 / 2.0 * (SCREEN_WIDTH) + FISH_WIDTH / 1.5) + SCREEN_DELAY;
-		//int enemyX1 = SCREEN_WIDTH / 9 + SCREEN_DELAY;
+		// int enemyX1 = SCREEN_WIDTH / 9 + SCREEN_DELAY;
 		int enemyY1 = enemyLoc();
 
 		// variable to hold the loop start time
@@ -380,94 +386,94 @@ public class Constants implements ActionListener, KeyListener {
 					enemyY1 = enemyLoc();
 					enemy.setVisible(true);
 				}
-					// decrement locations by the predetermined amount
-					xLoc1 -= X_MOVEMENT_DIFFERENCE;
-					xLoc2 -= X_MOVEMENT_DIFFERENCE;
+				// decrement locations by the predetermined amount
+				xLoc1 -= X_MOVEMENT_DIFFERENCE;
+				xLoc2 -= X_MOVEMENT_DIFFERENCE;
 
-					xLocFish1 -= X_MOVEMENT_DIFFERENCE * 1.1;
-					xLocFish2 -= X_MOVEMENT_DIFFERENCE * 1.3;
-					xLocFish3 -= X_MOVEMENT_DIFFERENCE * 1.5;
+				xLocFish1 -= X_MOVEMENT_DIFFERENCE * 1.1;
+				xLocFish2 -= X_MOVEMENT_DIFFERENCE * 1.3;
+				xLocFish3 -= X_MOVEMENT_DIFFERENCE * 1.5;
 
-					enemyX1 -= X_MOVEMENT_DIFFERENCE * 1.4;
+				enemyX1 -= X_MOVEMENT_DIFFERENCE * 1.4;
 
-					if (squidFired && !isSplash) {
-						squidYTracker = squidY;
-						squidFired = false;
-					}
+				if (squidFired && !isSplash) {
+					squidYTracker = squidY;
+					squidFired = false;
+				}
 
-					if (squidThrust && !isSplash) {
-						// move squid vertically
-						if (squidYTracker - squidY - SQUID_JUMP_DIFF < SQUID_JUMP_HEIGHT) {
-							if (squidY - SQUID_JUMP_DIFF > 0) {
-								squidY -= SQUID_JUMP_DIFF;
-							} else {
-								squidY = 0;
-								squidYTracker = squidY;
-								squidThrust = false;
-							}
+				if (squidThrust && !isSplash) {
+					// move squid vertically
+					if (squidYTracker - squidY - SQUID_JUMP_DIFF < SQUID_JUMP_HEIGHT) {
+						if (squidY - SQUID_JUMP_DIFF > 0) {
+							squidY -= SQUID_JUMP_DIFF;
 						} else {
+							squidY = 0;
 							squidYTracker = squidY;
 							squidThrust = false;
 						}
-					} else if (!isSplash) {
-						squidY += SQUID_FALL_DIFF;
+					} else {
 						squidYTracker = squidY;
+						squidThrust = false;
 					}
+				} else if (!isSplash) {
+					squidY += SQUID_FALL_DIFF;
+					squidYTracker = squidY;
+				}
 
-					// update the locations
-					bc1.setX(xLoc1);
-					bc1.setY(yLoc1);
-					bc2.setX(xLoc2);
-					bc2.setY(yLoc2);
-					tc1.setX(xLoc1);
-					tc1.setY(yLoc1 - CORALS_GAP - CORAL_HEIGHT); // ensure tc1 placed in proper location
-					tc2.setX(xLoc2);
-					tc2.setY(yLoc2 - CORALS_GAP - CORAL_HEIGHT); // ensure tc2 placed in proper location
-					fish1.setX(xLocFish1);
-					fish1.setY(fishY1);
-					fish2.setX(xLocFish2);
-					fish2.setY(fishY2);
-					fish3.setX(xLocFish3);
-					fish3.setY(fishY3);
-					enemy.setX(enemyX1);
-					enemy.setY(enemyY1);
+				// update the locations
+				bc1.setX(xLoc1);
+				bc1.setY(yLoc1);
+				bc2.setX(xLoc2);
+				bc2.setY(yLoc2);
+				tc1.setX(xLoc1);
+				tc1.setY(yLoc1 - CORALS_GAP - CORAL_HEIGHT); // ensure tc1 placed in proper location
+				tc2.setX(xLoc2);
+				tc2.setY(yLoc2 - CORALS_GAP - CORAL_HEIGHT); // ensure tc2 placed in proper location
+				fish1.setX(xLocFish1);
+				fish1.setY(fishY1);
+				fish2.setX(xLocFish2);
+				fish2.setY(fishY2);
+				fish3.setX(xLocFish3);
+				fish3.setY(fishY3);
+				enemy.setX(enemyX1);
+				enemy.setY(enemyY1);
 
-					if (!isSplash) {
-						squid.setX(squidX);
-						squid.setY(squidY);
-						pgs.setSquid(squid);
-						shield.setX(squidX - (SQUID_WIDTH/2));
-						shield.setY(squidY - (SQUID_HEIGHT/2));
-						pgs.setShield(shield);
-					}
+				if (!isSplash) {
+					squid.setX(squidX);
+					squid.setY(squidY);
+					pgs.setSquid(squid);
+					shield.setX(squidX - (SQUID_WIDTH / 2));
+					shield.setY(squidY - (SQUID_HEIGHT / 2));
+					pgs.setShield(shield);
+				}
 
-					// set the BottomCoral and TopCoral local variables in GameScreen by parsing
-					// the local variables
-					pgs.setBottomCoral(bc1, bc2);
-					pgs.setTopCoral(tc1, tc2);
-					pgs.setFish(fish1, fish2, fish3);
-					pgs.setEnemy(enemy);
+				// set the BottomCoral and TopCoral local variables in GameScreen by parsing
+				// the local variables
+				pgs.setBottomCoral(bc1, bc2);
+				pgs.setTopCoral(tc1, tc2);
+				pgs.setFish(fish1, fish2, fish3);
+				pgs.setEnemy(enemy);
 
 					if (!isSplash && squid.getWidth() != -1) { // need the second part because if squid not on-screen,
 																// cannot
 																// get image width and have cascading error in collision
 						collisionDetection(bc1, bc2, tc1, tc2, squid, shield);
 						updateScore(bc1, bc2, squid);
-						updateSpeed(bc1, bc2, squid);
+						updateSpeed();
 						updateShield(shield);
 						collisionFood(fish1, fish2, fish3, squid);
 						collisionEnemy(enemy, squid, shield);
 					}
 
-					// update pgs's JPanel
-					topPanel.revalidate();
-					topPanel.repaint();
+				// update pgs's JPanel
+				topPanel.revalidate();
+				topPanel.repaint();
 
-					// update the time-tracking variable after all operations completed
-					startTime = System.currentTimeMillis();
-				}
+				// update the time-tracking variable after all operations completed
+				startTime = System.currentTimeMillis();
 			}
 		}
+	}
 
 	/**
 	 * Calculates a random int for the bottom coral's placement
@@ -538,9 +544,11 @@ public class Constants implements ActionListener, KeyListener {
 		}
 	}
 
-	private void updateSpeed(BottomCoral bc1, BottomCoral bc2, Squid squid) {
-		if (pgs.speedUp()) {
-			X_MOVEMENT_DIFFERENCE += 5;
+	private void updateSpeed() {
+		if (pgs.speedUp() && !spedUp) {
+			X_MOVEMENT_DIFFERENCE += 3;
+			spedUp = true;
+			System.out.println(X_MOVEMENT_DIFFERENCE);
 		}
 	}
 
@@ -559,7 +567,8 @@ public class Constants implements ActionListener, KeyListener {
 	 * @param tc2   Second TopCoral object
 	 * @param squid Squid object
 	 */
-	private void collisionDetection(BottomCoral bc1, BottomCoral bc2, TopCoral tc1, TopCoral tc2, Squid squid, Shield shield) {
+	private void collisionDetection(BottomCoral bc1, BottomCoral bc2, TopCoral tc1, TopCoral tc2, Squid squid,
+			Shield shield) {
 		collisionCoral(squid, tc1, bc1, shield);
 		collisionCoral(squid, tc2, bc2, shield);
 		if (squid.getY() + SQUID_HEIGHT > SCREEN_HEIGHT * 7 / 8) { // ground detection
@@ -578,7 +587,7 @@ public class Constants implements ActionListener, KeyListener {
 
 	private void collisionCoral(Squid squid, TopCoral tc, BottomCoral bc, Shield shield) {
 		boolean isCollide;
-		if(bc.isVisible()){
+		if (bc.isVisible()) {
 			isCollide = collisionHelper(squid.getRectangle(), bc.getRectangle(), squid.getBI(), bc.getBI(), shield);
 			if(isCollide && shield.isVisible()){
 					bc.setVisible(false);
@@ -586,7 +595,7 @@ public class Constants implements ActionListener, KeyListener {
 					activateShield = false;
 				}
 		}
-		if(tc.isVisible()){
+		if (tc.isVisible()) {
 			isCollide = collisionHelper(squid.getRectangle(), tc.getRectangle(), squid.getBI(), tc.getBI(), shield);
 			if(isCollide && shield.isVisible()){
 					tc.setVisible(false);
@@ -612,9 +621,10 @@ public class Constants implements ActionListener, KeyListener {
 	}
 
 	private void collisionEnemy(Enemy enemy, Squid squid, Shield shield) {
-		if(enemy.isVisible){
-			boolean isCollide = collisionHelper(squid.getRectangle(), enemy.getRectangle(), squid.getBI(), enemy.getBI(), shield);
-			if(isCollide && shield.isVisible()){
+		if (enemy.isVisible) {
+			boolean isCollide = collisionHelper(squid.getRectangle(), enemy.getRectangle(), squid.getBI(),
+					enemy.getBI(), shield);
+			if (isCollide && shield.isVisible()) {
 				enemy.setVisible(false);
 				shield.setVisible(false);
 				activateShield = false;
@@ -644,7 +654,7 @@ public class Constants implements ActionListener, KeyListener {
 				for (int j = firstJ; j < r.getHeight() + firstJ; j++) {
 					if ((b1.getRGB(i, j) & 0xFF000000) != 0x00
 							&& (b2.getRGB(i + bp1XHelper, j + bp1YHelper) & 0xFF000000) != 0x00) {
-						if(!shield.isVisible()){
+						if (!shield.isVisible()) {
 							// pgs.sendText("Game Over");
 							gameOver = true;
 							loopVar = false; // stop the game loop
