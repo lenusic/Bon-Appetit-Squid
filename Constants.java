@@ -64,11 +64,11 @@ public class Constants implements ActionListener, KeyListener {
 	 * Default constructor
 	 */
 	public Constants() {
-		for (DisplayMode mode : GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayModes())
-			{
-			if(SCREEN_WIDTH != mode.getWidth()) SCREEN_WIDTH = mode.getWidth();
-			if(SCREEN_HEIGHT != mode.getHeight()) SCREEN_HEIGHT = mode.getHeight();
-			}
+		// for (DisplayMode mode : GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayModes())
+		// 	{
+		// 	if(SCREEN_WIDTH != mode.getWidth()) SCREEN_WIDTH = mode.getWidth();
+		// 	if(SCREEN_HEIGHT != mode.getHeight()) SCREEN_HEIGHT = mode.getHeight();
+		// 	}
 	}
 
 	public static void main(String[] args) {
