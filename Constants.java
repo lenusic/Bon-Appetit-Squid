@@ -54,6 +54,9 @@ public class Constants implements ActionListener, KeyListener {
 
 	private boolean gameOver = false;
 
+	private static Audio audioPlayer;
+	private static Audio gameOverAudio;
+
 	// global swing objects
 	private JFrame frame = new JFrame("Limber Squid");
 	private static JButton startGame, restartGame;
@@ -65,30 +68,24 @@ public class Constants implements ActionListener, KeyListener {
 	private static Constants tc = new Constants();
 	private static GameScreen pgs = new GameScreen(SCREEN_WIDTH, SCREEN_HEIGHT, true); // panel that has the moving
 																						// background at the start of
-																						// the game
+																				// the game
 
 	/**
 	 * Default constructor
 	 */
 	public Constants() {
-		// for (DisplayMode mode :
-		// GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-		// .getDisplayModes()) {
-		// if (SCREEN_WIDTH != mode.getWidth())
-		// SCREEN_WIDTH = mode.getWidth();
-		// if (SCREEN_HEIGHT != mode.getHeight())
-		// SCREEN_HEIGHT = mode.getHeight();
-		// }
 	}
 
 	public static void main(String[] args) {
 
-		        Audio audioPlayer = new Audio("resources/the-squid-song.wav");
+		audioPlayer = new Audio("resources/the-squid-song.wav");
+		gameOverAudio = new Audio("resources/gameOver.wav");
+		// Create and start the audio threads
+		Thread audioThread = new Thread(audioPlayer);
+		audioThread.start();
 
-		// Create and start the audio thread
-        Thread audioThread = new Thread(audioPlayer);
-        audioThread.start();
-        audioPlayer.play();
+		Thread gameOverAudioThread = new Thread(gameOverAudio);
+		gameOverAudioThread.start(); 
 
 		// build the GUI on a new thread
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -152,7 +149,6 @@ public class Constants implements ActionListener, KeyListener {
 	private void addGamoverText() {
 		gameoverLabel = new JButton();
 		gameoverLabel.setText("GAME OVER");
-
 		gameoverLabel.setForeground(new Color(200, 40, 60));
 		gameoverLabel.setFocusable(false);
 		gameoverLabel.setFont(new Font("Tahoma", Font.BOLD, 42));
@@ -164,6 +160,9 @@ public class Constants implements ActionListener, KeyListener {
 		gameoverLabel.setAlignmentY(1.0f); // center vertically on-screen
 		gameoverLabel.addActionListener(this);
 		gameoverLabel.setVisible(true);
+
+		audioPlayer.stop();
+		gameOverAudio.play();
 
 		topPanel.add(gameoverLabel);
 	}
@@ -215,8 +214,9 @@ public class Constants implements ActionListener, KeyListener {
 			// stop the splash screen
 			loopVar = false;
 			gamePlay = true;
-			
+
 			fadeOperation();
+			audioPlayer.play();
 		} else if (e.getSource() == buildComplete) {
 			Thread t = new Thread() {
 				public void run() {
@@ -233,6 +233,8 @@ public class Constants implements ActionListener, KeyListener {
 			gamePlay = true;
 			squidRespawn();
 			fadeOperation();
+			gameOverAudio.stop();
+			audioPlayer.play();
 		}
 	}
 
@@ -592,6 +594,7 @@ public class Constants implements ActionListener, KeyListener {
 				bc.setVisible(false);
 				shield.setVisible(false);
 			}
+			
 		}
 		if (tc.isVisible()) {
 			isCollide = collisionHelper(squid.getRectangle(), tc.getRectangle(), squid.getBI(), tc.getBI(), shield);
@@ -671,6 +674,7 @@ public class Constants implements ActionListener, KeyListener {
 		} else {
 			return false;
 		}
+
 	}
 
 }

@@ -1,14 +1,7 @@
 import java.io.File;
-import java.io.IOException;
-
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Audio implements Runnable {
     // to store current position
@@ -19,8 +12,9 @@ public class Audio implements Runnable {
     String status;
 
     AudioInputStream audioInputStream;
-    private String filePath = "resources/the-squid-song.wav";
+    private String filePath;
     private volatile boolean isPlaying;
+    private volatile boolean stopRequested;
 
     // constructor to initialize streams and clip
     public Audio(String audioFilePath) {
@@ -29,16 +23,18 @@ public class Audio implements Runnable {
 
     public void play() {
         isPlaying = true;
+        clip.start();
+
     }
 
     public void stop() {
-        isPlaying = false;
+        stopRequested = true;
+        clip.stop();
+        System.out.println("stopped Audio");
     }
 
     public void run() {
         try {
-            // throws UnsupportedAudioFileException,
-            // IOException, LineUnavailableException
 
             // create AudioInputStream object
             audioInputStream = AudioSystem.getAudioInputStream(new File(filePath).getAbsoluteFile());
@@ -49,9 +45,7 @@ public class Audio implements Runnable {
             // open audioInputStream to the clip
             clip.open(audioInputStream);
 
-            // clip.loop(Clip.LOOP_CONTINUOUSLY);
-
-            while (true) {
+            while (!stopRequested) {
                 if (isPlaying) {
                     clip.setFramePosition(0);
                     clip.start();
@@ -59,8 +53,11 @@ public class Audio implements Runnable {
                 } else {
                     Thread.sleep(10); // Sleep to reduce CPU usage when not playing
                 }
+            
             }
-
+            clip.stop();
+            clip.close();
+            audioInputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
