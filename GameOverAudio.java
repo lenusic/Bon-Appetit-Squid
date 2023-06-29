@@ -23,7 +23,8 @@ public class GameOverAudio implements Runnable {
 
     public void play() {
         isPlaying = true;
-        //clip.start();
+        clip.setFramePosition(0);
+        clip.start();
     }
 
     public void stop() {
@@ -43,11 +44,13 @@ public class GameOverAudio implements Runnable {
             // open audioInputStream to the clip
             clip.open(audioInputStream);
 
+            System.out.println(stopRequested);
             while (!stopRequested) {
                 if (isPlaying) {
                     clip.setFramePosition(0);
                     clip.start();
                     Thread.sleep(clip.getMicrosecondLength() / 1000); // Sleep until the clip finishes playing
+                    isPlaying = false;
                 } else {
                     Thread.sleep(10); // Sleep to reduce CPU usage when not playing
                 }

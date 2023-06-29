@@ -23,6 +23,7 @@ public class Audio implements Runnable {
 
     public void play() {
         isPlaying = true;
+        clip.setFramePosition(0);
         clip.start();
 
     }

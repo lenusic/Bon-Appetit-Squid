@@ -55,7 +55,7 @@ public class Constants implements ActionListener, KeyListener {
 	private boolean gameOver = false;
 
 	private static Audio audioPlayer;
-	private static Audio gameOverAudio;
+	private static GameOverAudio gameOverAudio;
 
 	// global swing objects
 	private JFrame frame = new JFrame("Limber Squid");
@@ -79,7 +79,7 @@ public class Constants implements ActionListener, KeyListener {
 	public static void main(String[] args) {
 
 		audioPlayer = new Audio("resources/the-squid-song.wav");
-		gameOverAudio = new Audio("resources/gameOver.wav");
+		gameOverAudio = new GameOverAudio("resources/gameOver.wav");
 		// Create and start the audio threads
 		Thread audioThread = new Thread(audioPlayer);
 		audioThread.start();
