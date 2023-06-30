@@ -33,7 +33,7 @@ public class Constants implements ActionListener, KeyListener {
 	private static final int SHIELD_WIDTH = SQUID_WIDTH + 100, SHIELD_HEIGHT = SQUID_HEIGHT + 100;
 
 	private static final int UPDATE_DIFFERENCE = 25; // time in ms between updates
-	private static int X_MOVEMENT_DIFFERENCE = 5; // distance the corals move every update
+	private int X_MOVEMENT_DIFFERENCE = 5; // distance the corals move every update
 	private static final int SCREEN_DELAY = 300; // needed because of long load times forcing corals to pop up
 													// mid-screen
 	private int SQUID_X_LOCATION = SCREEN_WIDTH / 7;
@@ -74,6 +74,9 @@ public class Constants implements ActionListener, KeyListener {
 																						// background at the start of
 																				// the game
 
+	private JDialog instructionsDialog;
+	private JButton openInstructions;
+
 	/**
 	 * Default constructor
 	 */
@@ -105,6 +108,10 @@ public class Constants implements ActionListener, KeyListener {
 				t.start();
 			}
 		});
+	}
+
+	public void resetSquidXLocation(){
+		SQUID_X_LOCATION = SCREEN_WIDTH /7;
 	}
 
 	/**
@@ -171,6 +178,39 @@ public class Constants implements ActionListener, KeyListener {
 		topPanel.add(gameoverLabel);
 	}
 
+	private void addInstructionsButton() {
+		openInstructions = new JButton("Instructions");
+		openInstructions.setForeground(new Color(0, 255, 127));
+		openInstructions.setFocusable(false);
+		openInstructions.setFont(new Font("Tahoma", Font.BOLD, 42));
+		openInstructions.setBorderPainted(false);
+		openInstructions.setContentAreaFilled(false);
+		openInstructions.setFocusPainted(false);
+		openInstructions.setOpaque(false);
+		openInstructions.setAlignmentX(0.5f); // center horizontally on-screen
+		openInstructions.setAlignmentY(0.09f); // center vertically on-screen
+		openInstructions.addActionListener(this);
+		openInstructions.setVisible(true);
+		openInstructions.setBounds(100, 100, 80, 30);
+		topPanel.add(openInstructions);
+	}
+
+	private void openInstructions() {
+		instructionsDialog = new JDialog(frame, "Instructions");
+		instructionsDialog.setSize(500, 200);
+		instructionsDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		instructionsDialog.setLocationRelativeTo(null);
+		instructionsDialog.setVisible(true);
+		JTextArea text = new JTextArea(
+				" \u2022 Press the space button to move around corals." +
+						"\n \u2022 with arrow keys you can move back and forwards." +
+						"\n \u2022 Collect 5 fish to get a shield, which protects you from the corals and seals." +
+						"\n \u2022 Speed will slightly increase after 10 corals passed." +
+						"\n \u2022 with arrow keys you can move back and forwards." +
+						"\n \u2022 Beware of seals!");
+		instructionsDialog.add(text);
+	}
+
 	private JPanel createContentPane() {
 		topPanel = new JPanel(); // top-most JPanel in layout hierarchy
 		// allow us to layer the panels
@@ -182,6 +222,7 @@ public class Constants implements ActionListener, KeyListener {
 			addRestartButton();
 		} else {
 			addStartButton();
+			addInstructionsButton();
 		}
 
 		// must add last to ensure button's visibility.
@@ -236,12 +277,16 @@ public class Constants implements ActionListener, KeyListener {
 			loopVar = false;
 			gamePlay = true;
 			squidRespawn();
+			resetSquidXLocation();
 			fadeOperation();
 
 			gameOverAudio.stop();
 			audioPlayer.play();
 
 			X_MOVEMENT_DIFFERENCE = 5;
+		}
+		if(e.getSource() == openInstructions){
+			openInstructions();
 		}
 	}
 
@@ -369,7 +414,8 @@ public class Constants implements ActionListener, KeyListener {
 		Shield shield = new Shield(SHIELD_WIDTH, SHIELD_HEIGHT);
 
 		// variables to track x and y image locations
-		int squidX = SQUID_X_LOCATION, squidY = squidYTracker;
+		//int squidX = SQUID_X_LOCATION
+		int squidY = squidYTracker;
 		int xLoc1 = SCREEN_WIDTH + SCREEN_DELAY,
 				xLoc2 = (int) ((double) 3.0 / 2.0 * SCREEN_WIDTH + CORAL_WIDTH / 2.0) + SCREEN_DELAY;
 		int yLoc1 = generateBottomCoralLocation(), yLoc2 = generateBottomCoralLocation();
@@ -470,10 +516,10 @@ public class Constants implements ActionListener, KeyListener {
 				enemy.setY(enemyY1);
 
 				if (!isSplash) {
-					squid.setX(squidX);
+					squid.setX(SQUID_X_LOCATION);
 					squid.setY(squidY);
 					pgs.setSquid(squid);
-					shield.setX(squidX - (SQUID_WIDTH / 2));
+					shield.setX(SQUID_X_LOCATION - (SQUID_WIDTH / 2));
 					shield.setY(squidY - (SQUID_HEIGHT / 2));
 					pgs.setShield(shield);
 				}
