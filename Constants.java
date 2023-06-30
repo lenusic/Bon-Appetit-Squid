@@ -54,7 +54,8 @@ public class Constants implements ActionListener, KeyListener {
 	private boolean eatenFish2 = false;
 	private boolean eatenFish3 = false;
 	private boolean spedUp = false;
-	private boolean activateShield = true; //true->shield can be activated, false->food score hasn't changed and shield should not be activated again
+	private boolean activateShield = true; // true->shield can be activated, false->food score hasn't changed and shield
+											// should not be activated again
 
 	private boolean gameOver = false;
 
@@ -72,7 +73,7 @@ public class Constants implements ActionListener, KeyListener {
 	private static Constants tc = new Constants();
 	private static GameScreen pgs = new GameScreen(SCREEN_WIDTH, SCREEN_HEIGHT, true); // panel that has the moving
 																						// background at the start of
-																				// the game
+	// the game
 
 	private JDialog instructionsDialog;
 	private JButton openInstructions;
@@ -92,7 +93,7 @@ public class Constants implements ActionListener, KeyListener {
 		audioThread.start();
 
 		Thread gameOverAudioThread = new Thread(gameOverAudio);
-		gameOverAudioThread.start(); 
+		gameOverAudioThread.start();
 
 		// build the GUI on a new thread
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -110,8 +111,8 @@ public class Constants implements ActionListener, KeyListener {
 		});
 	}
 
-	public void resetSquidXLocation(){
-		SQUID_X_LOCATION = SCREEN_WIDTH /7;
+	public void resetSquidXLocation() {
+		SQUID_X_LOCATION = SCREEN_WIDTH / 7;
 	}
 
 	/**
@@ -135,7 +136,7 @@ public class Constants implements ActionListener, KeyListener {
 		startGame.setOpaque(false);
 		startGame.setVisible(true);
 		startGame.setAlignmentX(0.5f); // center horizontally on-screen
-		startGame.setAlignmentY(0.5f); // center vertically on-screen
+		startGame.setAlignmentY(1.0f); // center vertically on-screen
 		startGame.addActionListener(this); // register listener to this object actions
 		topPanel.add(startGame);
 	}
@@ -285,7 +286,7 @@ public class Constants implements ActionListener, KeyListener {
 
 			X_MOVEMENT_DIFFERENCE = 5;
 		}
-		if(e.getSource() == openInstructions){
+		if (e.getSource() == openInstructions) {
 			openInstructions();
 		}
 	}
@@ -301,9 +302,9 @@ public class Constants implements ActionListener, KeyListener {
 			released = false;
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT && gamePlay == true && released == true) {
 			moveLeft = true;
-		}else if (e.getKeyCode() == KeyEvent.VK_RIGHT && gamePlay == true && released == true) {
+		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT && gamePlay == true && released == true) {
 			moveRight = true;
-		}else if (e.getKeyCode() == KeyEvent.VK_B && gamePlay == false) {
+		} else if (e.getKeyCode() == KeyEvent.VK_B && gamePlay == false) {
 			squidYTracker = SCREEN_HEIGHT / 2 - SQUID_HEIGHT; // need to reset the squid's starting height
 			squidThrust = false; // if user presses SPACE before collision and a collision occurs before reaching
 									// max height, you get residual jump, so this is preventative
@@ -414,7 +415,7 @@ public class Constants implements ActionListener, KeyListener {
 		Shield shield = new Shield(SHIELD_WIDTH, SHIELD_HEIGHT);
 
 		// variables to track x and y image locations
-		//int squidX = SQUID_X_LOCATION
+		// int squidX = SQUID_X_LOCATION
 		int squidY = squidYTracker;
 		int xLoc1 = SCREEN_WIDTH + SCREEN_DELAY,
 				xLoc2 = (int) ((double) 3.0 / 2.0 * SCREEN_WIDTH + CORAL_WIDTH / 2.0) + SCREEN_DELAY;
@@ -531,17 +532,17 @@ public class Constants implements ActionListener, KeyListener {
 				pgs.setFish(fish1, fish2, fish3);
 				pgs.setEnemy(enemy);
 
-					if (!isSplash && squid.getWidth() != -1) { // need the second part because if squid not on-screen,
-																// cannot
-																// get image width and have cascading error in collision
-						collisionDetection(bc1, bc2, tc1, tc2, squid, shield);
-						updateScore(bc1, bc2, squid);
-						updateSpeed();
-						updateShield(shield);
-						updateCharacterPosition();
-						collisionFood(fish1, fish2, fish3, squid);
-						collisionEnemy(enemy, squid, shield);
-					}
+				if (!isSplash && squid.getWidth() != -1) { // need the second part because if squid not on-screen,
+															// cannot
+															// get image width and have cascading error in collision
+					collisionDetection(bc1, bc2, tc1, tc2, squid, shield);
+					updateScore(bc1, bc2, squid);
+					updateSpeed();
+					updateShield(shield);
+					updateCharacterPosition();
+					collisionFood(fish1, fish2, fish3, squid);
+					collisionEnemy(enemy, squid, shield);
+				}
 
 				// update pgs's JPanel
 				topPanel.revalidate();
@@ -630,8 +631,8 @@ public class Constants implements ActionListener, KeyListener {
 		}
 	}
 
-	private void updateShield(Shield shield){
-		if(activateShield && shield.getLastShieldEnd() + 5 == pgs.getFoodScore()){
+	private void updateShield(Shield shield) {
+		if (activateShield && shield.getLastShieldEnd() + 5 == pgs.getFoodScore()) {
 			shield.setVisible(true);
 		}
 	}
@@ -680,21 +681,21 @@ public class Constants implements ActionListener, KeyListener {
 		if (bc.isVisible()) {
 			isCollide = collisionHelper(squid.getRectangle(), bc.getRectangle(), squid.getBI(), bc.getBI(), shield);
 
-			if(isCollide && shield.isVisible()){
-					bc.setVisible(false);
-					shield.setVisible(false);
-					shield.setLastShieldEnd(pgs.getFoodScore());
-					activateShield = false;
-				}
+			if (isCollide && shield.isVisible()) {
+				bc.setVisible(false);
+				shield.setVisible(false);
+				shield.setLastShieldEnd(pgs.getFoodScore());
+				activateShield = false;
+			}
 		}
 		if (tc.isVisible()) {
 			isCollide = collisionHelper(squid.getRectangle(), tc.getRectangle(), squid.getBI(), tc.getBI(), shield);
-			if(isCollide && shield.isVisible()){
-					tc.setVisible(false);
-					shield.setVisible(false);
-					shield.setLastShieldEnd(pgs.getFoodScore());
-					activateShield = false;
-				}
+			if (isCollide && shield.isVisible()) {
+				tc.setVisible(false);
+				shield.setVisible(false);
+				shield.setLastShieldEnd(pgs.getFoodScore());
+				activateShield = false;
+			}
 		}
 	}
 
