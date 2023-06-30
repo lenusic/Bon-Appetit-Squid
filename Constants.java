@@ -36,7 +36,9 @@ public class Constants implements ActionListener, KeyListener {
 	private static int X_MOVEMENT_DIFFERENCE = 5; // distance the corals move every update
 	private static final int SCREEN_DELAY = 300; // needed because of long load times forcing corals to pop up
 													// mid-screen
-	private static final int SQUID_X_LOCATION = SCREEN_WIDTH / 7;
+	private int SQUID_X_LOCATION = SCREEN_WIDTH / 7;
+	private boolean moveLeft = false;
+	private boolean moveRight = false;
 	private static final int SQUID_JUMP_DIFF = 10, SQUID_FALL_DIFF = SQUID_JUMP_DIFF / 2,
 			SQUID_JUMP_HEIGHT = CORALS_GAP - SQUID_HEIGHT - SQUID_JUMP_DIFF * 2;
 
@@ -252,7 +254,11 @@ public class Constants implements ActionListener, KeyListener {
 			}
 			squidThrust = true;
 			released = false;
-		} else if (e.getKeyCode() == KeyEvent.VK_B && gamePlay == false) {
+		} else if (e.getKeyCode() == KeyEvent.VK_LEFT && gamePlay == true && released == true) {
+			moveLeft = true;
+		}else if (e.getKeyCode() == KeyEvent.VK_RIGHT && gamePlay == true && released == true) {
+			moveRight = true;
+		}else if (e.getKeyCode() == KeyEvent.VK_B && gamePlay == false) {
 			squidYTracker = SCREEN_HEIGHT / 2 - SQUID_HEIGHT; // need to reset the squid's starting height
 			squidThrust = false; // if user presses SPACE before collision and a collision occurs before reaching
 									// max height, you get residual jump, so this is preventative
@@ -261,12 +267,19 @@ public class Constants implements ActionListener, KeyListener {
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			System.exit(0);
 		}
+		updateCharacterPosition();
 	}
 
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			released = true;
+		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			moveLeft = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			moveRight = false;
 		}
+		updateCharacterPosition();
+
 	}
 
 	public void keyTyped(KeyEvent e) {
@@ -479,6 +492,7 @@ public class Constants implements ActionListener, KeyListener {
 						updateScore(bc1, bc2, squid);
 						updateSpeed();
 						updateShield(shield);
+						updateCharacterPosition();
 						collisionFood(fish1, fish2, fish3, squid);
 						collisionEnemy(enemy, squid, shield);
 					}
@@ -574,6 +588,18 @@ public class Constants implements ActionListener, KeyListener {
 		if(activateShield && shield.getLastShieldEnd() + 5 == pgs.getFoodScore()){
 			shield.setVisible(true);
 		}
+	}
+
+	public void updateCharacterPosition() {
+		if (moveLeft) {
+			SQUID_X_LOCATION -= 10; // Move character left
+		}
+		if (moveRight) {
+			SQUID_X_LOCATION += 10; // Move character right
+		}
+		topPanel.revalidate();
+		topPanel.repaint();
+
 	}
 
 	/**
