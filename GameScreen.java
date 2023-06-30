@@ -16,7 +16,7 @@ public class GameScreen extends JPanel {
 	private boolean isSplash = true;
 	private int successfulJumps = 0;
 	private int food = 0;
-	private String message = "Bon appetit, Squid!";
+	private String message = "Limber Squid";
 	private Font primaryFont = new Font("Futura", Font.BOLD, 40), failFont = new Font("Calibri", Font.BOLD, 56);
 	private int messageWidth = 0, scoreWidth = 0;
 	private BottomCoral bc1, bc2;
